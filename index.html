@@ -1,0 +1,2648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E0E10">
+<title>ARENA · clickable prototype</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0E0E10}
+a{color:#C9A227}a:hover{color:#E0BC45}
+p{margin:0}
+.app{font-family:Inter,-apple-system,"Helvetica Neue",Arial,sans-serif;color:#F2EFE9;font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.app *{box-sizing:border-box}
+:where(.app) button,:where(.app) input,:where(.app) textarea{font-family:inherit;color:inherit;font-size:inherit}
+:where(.app) button{background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit}
+.scr{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:#0E0E10;animation:enter .3s ease;z-index:10}
+.body{flex:1;overflow-y:auto;padding:0 20px 24px;scrollbar-width:none}
+.body::-webkit-scrollbar,.sheet::-webkit-scrollbar,.pane::-webkit-scrollbar{display:none}
+.foot{padding:12px 20px 34px;display:flex;flex-direction:column;gap:6px;flex:none}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;height:56px;border-radius:16px;background:#C9A227;color:#0E0E10 !important;font-size:17px;font-weight:600;text-align:center;transition:opacity .2s,transform .1s;flex:none}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn2{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border-radius:16px;background:#1E1E22;font-size:17px;font-weight:600;flex:none}
+.link{color:#A6A6AE !important;font-size:15px;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center;width:100%}
+.h1{font-size:30px;font-weight:600;line-height:1.15;letter-spacing:-0.02em;margin:0}
+.h2{font-size:20px;font-weight:600;margin:0;letter-spacing:-0.01em;line-height:1.25}
+.sub{color:#A6A6AE;font-size:16px;margin-top:10px;line-height:1.45}
+.eyebrow{font-size:12px;color:#A6A6AE;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.card{background:#18181B;border-radius:16px;padding:16px}
+.muted{color:#A6A6AE}
+.small{font-size:13px}
+.gold{color:#C9A227}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:22px;background:#18181B;border:1px solid #2C2C32;font-size:15px;transition:border-color .2s,color .2s,box-shadow .2s}
+.chip.on{border-color:#C9A227;color:#C9A227;box-shadow:0 0 0 3px rgba(201,162,39,.14),0 0 22px rgba(201,162,39,.28)}
+.chip.sm{min-height:36px;padding:0 14px;font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tiles .chip{min-height:64px;border-radius:16px;justify-content:center;font-size:17px;font-weight:600}
+.topbar{display:flex;align-items:center;gap:12px;padding:52px 16px 18px;flex:none}
+.iconbtn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:22px;flex:none}
+.iconbtn.bg{background:#18181B}
+.track{flex:1;height:6px;border-radius:3px;background:#232327;overflow:hidden}
+.fill{height:100%;background:#C9A227;border-radius:3px;transition:width .45s ease}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.icf{fill:currentColor;stroke:none}
+.row{display:flex;align-items:center;gap:12px}
+.col{display:flex;flex-direction:column}
+.stack{display:flex;flex-direction:column;gap:12px}
+.note{margin-top:16px;font-size:15px;color:#F2EFE9;text-align:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.input{flex:1;height:48px;border-radius:14px;background:#18181B;border:1px solid #2C2C32;padding:0 14px;outline:none;font-size:16px;min-width:0}
+.input:focus,.ta:focus{border-color:#C9A227}
+.ta{width:100%;min-height:120px;border-radius:16px;background:#18181B;border:1px solid #2C2C32;padding:14px;outline:none;font-size:16px;resize:none;line-height:1.45}
+.addbtn{width:48px;height:48px;border-radius:14px;background:#18181B;border:1px solid #2C2C32;display:flex;align-items:center;justify-content:center;flex:none}
+.tier{background:#18181B;border-radius:16px;padding:14px 14px 16px;display:flex;flex-direction:column;gap:12px;border:1px solid transparent;transition:border-color .2s}
+.tier.ready{border-color:rgba(201,162,39,.5)}
+.drop{height:36px;padding:0 14px;border-radius:18px;border:1px solid #C9A227;color:#C9A227;font-size:14px;font-weight:600;display:flex;align-items:center}
+.empty{font-size:14px;color:#7E7E86}
+.sentence{font-size:24px;line-height:1.5;font-weight:400}
+.field{display:inline;padding:2px 4px;border-bottom:2px solid #3A3A40;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
+.field.on{border-color:#C9A227;color:#C9A227}
+.amount{font-size:52px;font-weight:600;letter-spacing:-0.03em;line-height:1}
+.slider{width:100%;accent-color:#C9A227;height:28px}
+.pad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.key{height:50px;border-radius:14px;background:#18181B;font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;text-align:center}
+.sheet .key{background:#1E1E22}
+.key:active{background:#26262B}
+.plan{display:flex;align-items:center;gap:14px;width:100%;padding:16px;border-radius:16px;background:#18181B;border:1.5px solid #2C2C32;position:relative;text-align:left}
+.sheet .plan{background:#1E1E22}
+.plan.on{border-color:#C9A227}
+.radio{width:22px;height:22px;border-radius:11px;border:2px solid #4A4A50;flex:none;display:flex;align-items:center;justify-content:center}
+.plan.on .radio,.opt.on .radio,.rwrap.on .radio{border-color:#C9A227}
+.plan.on .radio::after,.opt.on .radio::after,.rwrap.on .radio::after{content:"";width:10px;height:10px;border-radius:5px;background:#C9A227}
+.tag{position:absolute;top:-11px;right:14px;background:#C9A227;color:#0E0E10;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.02em}
+.tl{display:flex;gap:14px}
+.tldot{width:28px;height:28px;border-radius:14px;background:#232327;display:flex;align-items:center;justify-content:center;flex:none;color:#C9A227}
+.tldot.on{background:#C9A227;color:#0E0E10}
+.tlline{width:2px;flex:1;background:#2C2C32;margin:4px auto 0;min-height:22px}
+.floor{display:flex;align-items:center;background:#18181B;border-radius:16px;transition:opacity .35s ease}
+.floor.done{opacity:.8}
+.floorMain{flex:1;display:flex;align-items:center;gap:14px;padding:14px 4px 14px 16px;min-height:68px;min-width:0}
+.cb{width:28px;height:28px;border-radius:14px;border:2px solid #45454C;display:flex;align-items:center;justify-content:center;flex:none;transition:background .2s,border-color .2s}
+.cb.on{background:#4CAF7A;border-color:#4CAF7A;color:#0E0E10}
+.cb .ic{width:16px;height:16px;stroke-width:3}
+.fsent{font-size:13px;color:#A6A6AE;display:block}
+.fsent.vote{color:#C9A227;font-weight:600}
+.fact{font-size:16px;font-weight:600;display:block}
+.floor.done .fact{text-decoration:line-through;text-decoration-color:rgba(242,239,233,.45)}
+.frew{font-size:13px;color:#C9A227;display:flex;align-items:center;gap:6px;margin-top:4px}
+.fextra{font-size:13px;color:#A6A6AE;display:flex;align-items:center;gap:6px;margin-top:4px}
+.lockbtn{width:44px;height:68px;display:flex;align-items:center;justify-content:center;color:#C9A227;flex:none}
+.lockbtn .ic,.proofbtn .ic{width:18px;height:18px}
+.proofbtn{width:40px;height:68px;display:flex;align-items:center;justify-content:center;color:#A6A6AE;flex:none}
+.fab{width:52px;height:52px;border-radius:26px;background:#C9A227;color:#0E0E10;display:flex;align-items:center;justify-content:center;flex:none}
+.big{font-size:34px;font-weight:600;letter-spacing:-0.02em;line-height:1.1}
+.streak{display:flex;align-items:center;gap:6px;background:#18181B;border-radius:22px;height:44px;padding:0 14px 0 10px}
+.streak .num{font-size:20px;font-weight:600;color:#C9A227}
+.shieldmini{width:16px;height:16px}
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;background:#0E0E10;border-top:1px solid #1F1F23;padding:6px 8px 24px;z-index:5}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;color:#8C8C94;text-align:center}
+.tab.on{color:#F2EFE9}
+.pane{position:absolute;top:0;left:0;right:0;bottom:84px;overflow-y:auto;padding:56px 20px 28px;scrollbar-width:none;animation:enter .28s ease}
+.glabel{font-size:12px;color:#A6A6AE;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:28px 4px 10px;display:flex;align-items:center;justify-content:space-between}
+.group{background:#18181B;border-radius:16px;overflow:hidden}
+.srow{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:10px 16px;text-align:left}
+.srow+.srow{border-top:1px solid #232327}
+.sicon{width:30px;height:30px;border-radius:8px;background:#26262B;display:flex;align-items:center;justify-content:center;flex:none}
+.sicon .ic{width:17px;height:17px}
+.slabel{flex:1;font-size:16px;min-width:0}
+.sval{color:#A6A6AE;font-size:15px;text-align:right}
+.chev{width:16px;height:16px;color:#5C5C64}
+.lockmini{width:16px;height:16px;color:#C9A227}
+.sw{width:51px;height:31px;border-radius:16px;background:#3A3A40;position:relative;transition:background .2s;flex:none;display:block}
+.sw.on{background:#F2EFE9}
+.knob{position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:14px;background:#F2EFE9;transition:transform .2s,background .2s}
+.sw.on .knob{transform:translateX(20px);background:#0E0E10}
+.pill{height:36px;padding:0 16px;border-radius:18px;background:#26262B;font-size:14px;font-weight:600;display:flex;align-items:center;flex:none;gap:6px}
+.pill.gold{background:#C9A227;color:#0E0E10}
+.protag{font-size:11px;font-weight:600;color:#C9A227;border:1px solid rgba(201,162,39,.55);border-radius:6px;padding:2px 6px;letter-spacing:.04em}
+.soon{font-size:10px;font-weight:600;letter-spacing:.06em;color:#A6A6AE;border:1px solid #3A3A40;border-radius:6px;padding:2px 6px}
+.grid{display:grid;grid-template-rows:repeat(7,16px);grid-auto-flow:column;grid-auto-columns:16px;gap:4px}
+.cell{width:16px;height:16px;border-radius:4px;background:#2A2A30;display:flex;align-items:center;justify-content:center}
+.cell.d{background:#C9A227}
+.cell.n{background:transparent;border:1px solid #1F1F23}
+.cell.s{background:#2A2A30;color:#C9A227}
+.cell.t{background:transparent;border:1.5px solid #C9A227}
+.cell .ic{width:11px;height:11px;stroke-width:2.4}
+.bar{position:relative;height:10px;border-radius:5px;background:#26262B}
+.barfill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:#C9A227;transition:width .6s ease}
+.tick{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:#0E0E10;border-radius:1px}
+.stat{background:#18181B;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.stat .v{font-size:26px;font-weight:600;letter-spacing:-0.02em}
+.scrim{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.62);z-index:20;width:100%;cursor:default}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:21;background:#151518;border-radius:24px 24px 0 0;padding:8px 20px 34px;max-height:90%;overflow-y:auto;animation:sheet .3s cubic-bezier(.2,.9,.3,1);scrollbar-width:none;display:flex;flex-direction:column;gap:16px}
+.grab{width:36px;height:5px;border-radius:3px;background:#3A3A40;margin:0 auto;flex:none}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:56px;padding:12px 16px;border-radius:16px;background:#1E1E22;border:1.5px solid transparent;text-align:left}
+.opt.on{border-color:#C9A227}
+.toast{position:absolute;top:56px;left:20px;right:20px;z-index:40;background:#F2EFE9;color:#0E0E10;border-radius:14px;padding:14px 16px;font-size:15px;font-weight:600;animation:toast .3s ease;text-align:center}
+.banner{position:absolute;top:10px;left:8px;right:8px;z-index:45;background:#2A2A30;border-radius:22px;display:flex;align-items:flex-start;box-shadow:0 12px 32px rgba(0,0,0,.55);animation:toast .35s ease}
+.bannerMain{flex:1;display:flex;gap:12px;align-items:flex-start;padding:14px 4px 14px 14px;text-align:left;min-width:0}
+.appic{width:38px;height:38px;border-radius:10px;background:#C9A227;color:#0E0E10;display:flex;align-items:center;justify-content:center;font-weight:600;flex:none}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 28px;gap:12px}
+.share{background:#18181B;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:18px;border:1px solid #2C2C32;animation:cardin .5s cubic-bezier(.2,.9,.3,1)}
+.wm{font-weight:600;letter-spacing:.32em;font-size:13px}
+.avatar{width:56px;height:56px;border-radius:28px;background:#26262B;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;flex:none}
+.contact{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:8px 4px;text-align:left}
+.contact+.contact{border-top:1px solid #232327}
+.av2{width:40px;height:40px;border-radius:20px;background:#26262B;display:flex;align-items:center;justify-content:center;font-weight:600;flex:none}
+.oldfloor{transition:all .4s ease}
+.oldfloor.gone{text-decoration:line-through;color:#7E7E86;font-size:15px}
+.newfloor{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:#1E1E22;border-radius:12px;padding:3px;gap:3px}
+.segb{height:40px;border-radius:10px;font-weight:600;font-size:14px;text-align:center;color:#A6A6AE;display:flex;align-items:center;justify-content:center}
+.segb.on{background:#F2EFE9;color:#0E0E10}
+.stepb{width:44px;height:44px;border-radius:22px;background:#26262B;display:flex;align-items:center;justify-content:center;flex:none}
+.stepb .ic{width:18px;height:18px}
+.tval{min-width:92px;text-align:center;font-weight:600;font-size:16px}
+.rrow{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;min-height:64px}
+.rrow+.rrow{border-top:1px solid #232327}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.day{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:14px;min-height:62px;text-align:center}
+.day .dn{font-size:17px;font-weight:600}
+.day .dw{font-size:11px;color:#A6A6AE;font-weight:600}
+.day.on{background:#F2EFE9;color:#0E0E10}
+.day.on .dw{color:#3A3A40}
+.dot{width:4px;height:4px;border-radius:2px;background:currentColor}
+.dot.off{background:transparent}
+.tl2{display:flex;gap:10px;align-items:stretch}
+.tlt{width:64px;flex:none;font-size:13px;color:#A6A6AE;padding-top:16px;text-align:right}
+.tlcard{flex:1;display:flex;align-items:center;gap:12px;background:#18181B;border-radius:16px;padding:12px 14px;min-height:56px;text-align:left;min-width:0}
+.tlnudge{flex:1;display:flex;align-items:center;gap:8px;padding:12px 4px;font-size:13px;color:#A6A6AE;min-width:0}
+.planfab{position:absolute;right:20px;bottom:100px;z-index:6;width:56px;height:56px;border-radius:28px;background:#C9A227;color:#0E0E10;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.goldbg{background:#C9A227 !important;color:#0E0E10}
+.vbar{height:8px;border-radius:4px;background:#26262B;overflow:hidden}
+.vfill{height:100%;background:#C9A227;border-radius:4px}
+.widget{width:158px;height:158px;border-radius:24px;background:#18181B;border:1px solid #2C2C32;padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.shake{animation:shake .45s ease}
+.pop{animation:pop .38s cubic-bezier(.2,1.4,.4,1)}
+.flick{animation:flick 1.1s ease;transform-origin:50% 90%}
+.flameBig{width:84px;height:84px;color:#C9A227;animation:flick 1.3s ease;transform-origin:50% 90%}
+.countup{animation:countup .6s cubic-bezier(.2,1.4,.4,1)}
+.ringc{transition:stroke-dashoffset .7s cubic-bezier(.3,.8,.3,1)}
+@keyframes enter{from{transform:translateY(10px)}to{transform:none}}
+@keyframes sheet{from{transform:translateY(60px)}to{transform:none}}
+@keyframes toast{from{transform:translateY(-12px)}to{transform:none}}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@keyframes flick{0%{transform:scale(1)}20%{transform:scale(1.22) rotate(-7deg)}45%{transform:scale(.94) rotate(5deg)}70%{transform:scale(1.1) rotate(-2deg)}100%{transform:scale(1)}}
+@keyframes countup{0%{transform:translateY(18px) scale(.8)}100%{transform:none}}
+@keyframes cardin{from{transform:translateY(24px) scale(.96)}to{transform:none}}
+</style>
+
+<style>
+html,body{height:100%}
+body{margin:0;background:#050506;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,-apple-system,"Helvetica Neue",Arial,sans-serif}
+.phone{width:390px;height:844px;border-radius:48px;overflow:hidden;position:relative;box-shadow:0 0 0 10px #1a1a1d,0 0 0 11px #2c2c32,0 40px 120px rgba(0,0,0,.6)}
+.hint{position:fixed;left:16px;bottom:14px;color:#6A6A72;font-size:12px}
+@media (max-width:500px){ body{display:block;background:#0E0E10} .phone{border-radius:0;box-shadow:none;width:100vw;height:100vh;height:100dvh} .phone>.app{width:100% !important;height:100% !important} .hint{display:none} }
+</style>
+</head>
+<body>
+<div class="phone" id="phone"></div>
+<p class="hint">ARENA prototype · demo controls are in the You tab</p>
+<template id="arena-template"><div class="app" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0E0E10">
+
+<!-- ============ ONBOARDING ============ -->
+<sc-if value="{{isOb}}" hint-placeholder-val="{{true}}">
+<div class="scr">
+<sc-if value="{{obShowTop}}" hint-placeholder-val="{{false}}">
+<div class="topbar">
+<button class="iconbtn" aria-label="Back" onClick="{{obBack}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 5 8 12 15 19"></polyline></svg></button>
+<div class="track"><div class="fill" style="width: {{obPct}}%"></div></div>
+<span class="muted small" style="width: 36px; text-align: right">{{obStepLabel}}</span>
+</div>
+</sc-if>
+
+<!-- 0 Welcome -->
+<sc-if value="{{ob0}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<div class="body" style="display: flex; flex-direction: column; padding-top: 72px">
+<div class="wm gold">ARENA</div>
+<div style="flex: 1"></div>
+<h1 class="h1" style="font-size: 46px; line-height: 1.05; letter-spacing: -0.03em">Stop starting.<br>Start finishing.</h1>
+<div class="stack" style="margin-top: 32px; gap: 18px">
+<div class="row" style="align-items: flex-start"><span class="gold small" style="font-weight: 600; width: 22px; padding-top: 2px">01</span><span style="font-size: 16px">Pick the two things that matter.</span></div>
+<div class="row" style="align-items: flex-start"><span class="gold small" style="font-weight: 600; width: 22px; padding-top: 2px">02</span><span style="font-size: 16px">Set floors you can clear on your worst day.</span></div>
+<div class="row" style="align-items: flex-start"><span class="gold small" style="font-weight: 600; width: 22px; padding-top: 2px">03</span><span style="font-size: 16px">Get nudged around your real day, and back up fast when you slip.</span></div>
+</div>
+</div>
+<div class="foot">
+<button class="btn" onClick="{{obNext}}">Get started</button>
+<button class="link" onClick="{{loginDemo}}">I already have an account</button>
+</div>
+</div>
+</sc-if>
+
+<!-- 1 Identity -->
+<sc-if value="{{ob1}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">Who are you becoming?</h1>
+<p class="sub">Pick up to 2. Every floor you clear counts as a vote for this person.</p>
+<div class="tiles {{idShake}}" style="margin-top: 28px">
+<sc-for list="{{idChips}}" as="c" hint-placeholder-count="6">
+<button class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.toggle}}">{{c.label}}</button>
+</sc-for>
+</div>
+<sc-if value="{{obMsgOn}}" hint-placeholder-val="{{false}}"><p class="note">{{obMsg}}</p></sc-if>
+</div>
+<div class="foot"><button class="btn" disabled="{{obDis}}" onClick="{{obNext}}">Continue</button></div>
+</div>
+</sc-if>
+
+<!-- 2 Goals -->
+<sc-if value="{{ob2}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">What are you juggling right now?</h1>
+<p class="sub">Add up to 6. All of it, even the stuff you feel guilty about.</p>
+<div class="chips {{goalShake}}" style="margin-top: 28px">
+<sc-for list="{{goalChips}}" as="c" hint-placeholder-count="6">
+<button class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.toggle}}">{{c.label}}</button>
+</sc-for>
+</div>
+<div class="row" style="margin-top: 20px; gap: 10px">
+<label class="sr" for="addgoal">Add your own</label>
+<input id="addgoal" class="input" placeholder="Add your own" value="{{customGoal}}" onChange="{{onCustom}}">
+<button class="addbtn" aria-label="Add goal" onClick="{{addCustom}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+<p class="muted small" style="margin-top: 12px">{{goalCountLabel}}</p>
+<sc-if value="{{obMsgOn}}" hint-placeholder-val="{{false}}"><p class="note">{{obMsg}}</p></sc-if>
+</div>
+<div class="foot"><button class="btn" disabled="{{obDis}}" onClick="{{obNext}}">Continue</button></div>
+</div>
+</sc-if>
+
+<!-- 3 Tier sort -->
+<sc-if value="{{ob3}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">Now sort it.</h1>
+<p class="sub">Tap an item, then tap where it goes.</p>
+<sc-if value="{{hasUnsorted}}" hint-placeholder-val="{{true}}">
+<div class="chips" style="margin-top: 20px">
+<sc-for list="{{unsortedChips}}" as="c" hint-placeholder-count="3">
+<button class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button>
+</sc-for>
+</div>
+</sc-if>
+<div class="stack" style="margin-top: 20px">
+<sc-for list="{{tierBoxes}}" as="t" hint-placeholder-count="3">
+<div class="{{t.cls}}">
+<div class="row" style="justify-content: space-between">
+<div class="col"><span style="font-weight: 600; font-size: 16px">{{t.title}}</span><span class="muted small">{{t.sub}}</span></div>
+<sc-if value="{{t.canDrop}}" hint-placeholder-val="{{false}}"><button class="drop" onClick="{{t.drop}}">Move here</button></sc-if>
+</div>
+<sc-if value="{{t.empty}}" hint-placeholder-val="{{false}}"><span class="empty">Empty</span></sc-if>
+<div class="chips">
+<sc-for list="{{t.items}}" as="c" hint-placeholder-count="1">
+<button class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button>
+</sc-for>
+</div>
+<sc-if value="{{t.msgOn}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; color: #C9A227">Two is the limit. That's the point.</span></sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+<div class="foot"><button class="btn" disabled="{{obDis}}" onClick="{{obNext}}">Continue</button></div>
+</div>
+</sc-if>
+
+<!-- 4 Your day -->
+<sc-if value="{{ob4}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">What does your day look like?</h1>
+<p class="sub">ARENA nudges you around your real day. Change any single day later in Plan.</p>
+<div class="group" style="margin-top: 24px">
+<sc-for list="{{routineRows}}" as="r" hint-placeholder-count="5">
+<div class="rrow">
+<div class="col" style="flex: 1; min-width: 0"><span style="font-weight: 600; font-size: 16px">{{r.label}}</span><span class="muted small">{{r.sub}}</span></div>
+<button class="stepb" aria-label="{{r.minusAria}}" onClick="{{r.minus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"></path></svg></button>
+<span class="tval">{{r.time}}</span>
+<button class="stepb" aria-label="{{r.plusAria}}" onClick="{{r.plus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></button>
+</div>
+</sc-for>
+</div>
+<p class="muted small" style="margin-top: 14px">Each tap moves a time by 15 minutes.</p>
+</div>
+<div class="foot"><button class="btn" onClick="{{obNext}}">This is my day</button></div>
+</div>
+</sc-if>
+
+<!-- 5 If-then floor -->
+<sc-if value="{{ob5}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">Set your first floor.</h1>
+<p class="sub">Small enough to clear on your worst day. Tie it to a moment in your day.</p>
+<div class="card" style="margin-top: 24px; padding: 20px">
+<p class="sentence">When <button class="{{whenCls}}" onClick="{{focusWhen}}">{{whenText}}</button>, I will <button class="{{thenCls}}" onClick="{{focusThen}}">{{thenText}}</button>.</p>
+<p class="muted small" style="margin-top: 10px">{{floorNudgeNote}}</p>
+</div>
+<div class="row" style="margin-top: 20px; gap: 10px">
+<label class="sr" for="fieldin">{{fieldLabel}}</label>
+<input id="fieldin" class="input" placeholder="{{fieldLabel}}" value="{{fieldVal}}" onChange="{{onField}}">
+</div>
+<p class="eyebrow" style="margin: 20px 0 10px">{{sugLabel}}</p>
+<div class="chips">
+<sc-for list="{{sugChips}}" as="c" hint-placeholder-count="4">
+<button class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button>
+</sc-for>
+</div>
+</div>
+<div class="foot"><button class="btn" disabled="{{obDis}}" onClick="{{obNext}}">Lock in this floor</button></div>
+</div>
+</sc-if>
+
+<!-- 6 Savings floor -->
+<sc-if value="{{ob6}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body" style="padding-bottom: 8px">
+<h1 class="h1" style="font-size: 26px">How much can you save, even in a bad month?</h1>
+<div class="row" style="margin-top: 16px; align-items: baseline; gap: 8px"><span class="amount">{{saveAmtFmt}}</span><span class="muted">/ month</span></div>
+<label class="sr" for="saveslider">Monthly savings</label>
+<input id="saveslider" class="slider" type="range" min="25" max="2000" step="25" value="{{saveAmt}}" onChange="{{onSlide}}" style="margin-top: 8px">
+<div class="card row" style="margin-top: 8px; justify-content: space-between; padding: 14px 16px">
+<div class="col"><span class="muted small">{{futureAgeLabel}}</span><span class="big gold" style="font-size: 30px">{{futureObFmt}}</span></div>
+<div class="col" style="align-items: center; gap: 4px"><span class="muted small">Your age</span>
+<div class="row" style="gap: 6px">
+<button class="stepb" style="width: 36px; height: 36px" aria-label="Younger" onClick="{{ageMinus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"></path></svg></button>
+<span style="font-weight: 600; font-size: 18px; width: 28px; text-align: center">{{age}}</span>
+<button class="stepb" style="width: 36px; height: 36px" aria-label="Older" onClick="{{agePlus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></button>
+</div>
+</div>
+</div>
+<p class="muted small" style="margin-top: 6px">{{futureObNote}}</p>
+<div class="pad" style="margin-top: 10px">
+<sc-for list="{{obKeys}}" as="k" hint-placeholder-count="12">
+<button class="key" aria-label="{{k.aria}}" onClick="{{k.press}}">
+<sc-if value="{{k.isDel}}" hint-placeholder-val="{{false}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h10.5A1.5 1.5 0 0 1 21 7.5v9a1.5 1.5 0 0 1-1.5 1.5H9l-6-6 6-6z"></path><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"></path></svg></sc-if>
+<sc-if value="{{k.isNum}}" hint-placeholder-val="{{true}}">{{k.label}}</sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+<div class="foot"><button class="btn" disabled="{{obDis}}" onClick="{{obNext}}">Set savings floor</button></div>
+</div>
+</sc-if>
+
+<!-- 7 Notifications -->
+<sc-if value="{{ob7}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">Nudges that fit your day.</h1>
+<p class="sub">Here's tomorrow. Turn them on and we'll take it from here.</p>
+<div class="stack" style="margin-top: 24px; gap: 10px">
+<sc-for list="{{obNudges}}" as="n" hint-placeholder-count="5">
+<div class="card row" style="align-items: flex-start; padding: 12px 14px">
+<div class="appic" style="width: 32px; height: 32px; border-radius: 8px; font-size: 13px">A</div>
+<div class="col" style="flex: 1; min-width: 0"><div class="row" style="justify-content: space-between"><span style="font-weight: 600">{{n.title}}</span><span class="muted small">{{n.time}}</span></div><span class="muted small">{{n.body}}</span></div>
+</div>
+</sc-for>
+</div>
+<p class="muted small" style="margin-top: 14px">Plus one reminder 2 days before your trial ends.</p>
+</div>
+<div class="foot">
+<button class="btn" onClick="{{notifOn}}">Turn on</button>
+<button class="link" onClick="{{notifOff}}">Not now</button>
+</div>
+</div>
+</sc-if>
+
+<!-- 8 Paywall -->
+<sc-if value="{{ob8}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">Your system is ready.</h1>
+<div class="card" style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px">
+<div class="row" style="justify-content: space-between"><span class="muted">Becoming</span><span style="font-weight: 600">{{recapIds}}</span></div>
+<div class="row" style="justify-content: space-between"><span class="muted">Daily focus</span><span style="font-weight: 600; text-align: right">{{recapFocus}}</span></div>
+<div class="col" style="gap: 2px"><span class="muted">First floor</span><span style="font-weight: 600">{{recapFloor}}</span></div>
+<div class="row" style="justify-content: space-between"><span class="muted">Your day</span><span style="font-weight: 600">{{recapDay}}</span></div>
+<div class="row" style="justify-content: space-between"><span class="muted">{{futureAgeLabel}}</span><span class="gold" style="font-weight: 600">{{futureObFmt}}</span></div>
+</div>
+<p class="eyebrow" style="margin: 26px 0 14px">Your first week</p>
+<div class="col">
+<div class="tl"><div class="col" style="align-items: center"><div class="tldot on"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; stroke-width: 2.6"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg></div><div class="tlline"></div></div><div class="col" style="padding-bottom: 14px"><span style="font-weight: 600">Today</span><span class="muted small">Full access. Your floors and nudges start tonight.</span></div></div>
+<div class="tl"><div class="col" style="align-items: center"><div class="tldot"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M5 20V11M12 20V5M19 20v-6"></path></svg></div><div class="tlline"></div></div><div class="col" style="padding-bottom: 14px"><span style="font-weight: 600">Day 3</span><span class="muted small">Your first Coach insight on your own patterns.</span></div></div>
+<div class="tl"><div class="col" style="align-items: center"><div class="tldot"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg></div><div class="tlline"></div></div><div class="col" style="padding-bottom: 14px"><span style="font-weight: 600">Day 5</span><span class="muted small">We remind you the trial is ending.</span></div></div>
+<div class="tl"><div class="col" style="align-items: center"><div class="tldot"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6l7-3z"></path></svg></div></div><div class="col"><span style="font-weight: 600">Day 7 · {{trialEndLabel}}</span><span class="muted small">First streak shield earned. Trial ends, billing starts unless you cancel.</span></div></div>
+</div>
+<div class="stack" style="margin-top: 26px; gap: 16px">
+<button class="{{planAnnualCls}}" onClick="{{pickAnnual}}"><span class="radio"></span><span class="col" style="flex: 1"><span style="font-weight: 600; font-size: 16px">Annual</span><span class="muted small">$3.33/mo, billed yearly</span></span><span style="font-weight: 600; font-size: 16px">$39.99/yr</span><span class="tag">BEST VALUE · SAVE 58%</span></button>
+<button class="{{planMonthlyCls}}" onClick="{{pickMonthly}}"><span class="radio"></span><span class="col" style="flex: 1"><span style="font-weight: 600; font-size: 16px">Monthly</span><span class="muted small">Flexible, cancel anytime</span></span><span style="font-weight: 600; font-size: 16px">$7.99/mo</span></button>
+</div>
+</div>
+<div class="foot" style="gap: 2px; padding-top: 14px">
+<button class="btn" onClick="{{startTrial}}">Start my 7-day free trial</button>
+<p class="muted small" style="text-align: center; margin-top: 8px">Cancel anytime in 2 taps. {{planAfter}}</p>
+<button class="link" style="min-height: 36px; font-size: 14px" onClick="{{restore}}">Restore purchases</button>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<!-- ============ TRIAL SUCCESS ============ -->
+<sc-if value="{{isSuccess}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="center">
+<div class="pop" style="width: 88px; height: 88px; border-radius: 44px; background: #C9A227; color: #0E0E10; display: flex; align-items: center; justify-content: center"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 40px; height: 40px; stroke-width: 2.6"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg></div>
+<h1 class="h1" style="margin-top: 16px; font-size: 36px">Day 1 starts now.</h1>
+<p class="sub" style="margin-top: 0">Your trial is on. First nudge at {{firstNudgeTime}}. We'll remind you on Day 5, before anything is charged.</p>
+</div>
+<div class="foot"><button class="btn" onClick="{{finishOb}}">Go to Today</button></div>
+</div>
+</sc-if>
+
+<!-- ============ MAIN APP ============ -->
+<sc-if value="{{isApp}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0">
+
+<!-- TODAY -->
+<sc-if value="{{tabToday}}" hint-placeholder-val="{{true}}">
+<div class="pane">
+<div class="row" style="justify-content: space-between; align-items: flex-start">
+<div class="col"><span class="eyebrow">{{dateLabel}}</span><h1 class="h1" style="margin-top: 4px">Today</h1></div>
+<div class="row" style="gap: 8px">
+<button class="iconbtn bg" aria-label="Park a new idea" onClick="{{openIdea}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"></path></svg></button>
+<div class="streak" aria-label="{{streakAria}}">
+<svg class="{{flameCls}}" viewBox="0 0 24 24" aria-hidden="true" style="width: 22px; height: 22px; color: #C9A227"><path d="M12 2.5c.6 3.2 4.8 5.6 4.8 10.4a4.8 4.8 0 0 1-9.6 0c0-2.2 1-3.7 2.2-4.9.1 1.8.9 3 2 3.4-.4-3.1-.2-5.9.6-8.9z"></path></svg>
+<span class="num">{{streak}}</span>
+<span style="width: 1px; height: 18px; background: #2C2C32; margin: 0 4px"></span>
+<svg class="ic shieldmini" viewBox="0 0 24 24" aria-hidden="true" style="color: {{shieldColor}}"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6l7-3z"></path></svg>
+<span class="small" style="color: {{shieldColor}}; font-weight: 600">{{shields}}</span>
+</div>
+</div>
+</div>
+
+<sc-if value="{{trialEnded}}" hint-placeholder-val="{{false}}">
+<div class="card" style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px">
+<p style="font-weight: 600">Your trial ended.</p>
+<p class="muted">Floors, streaks, nudges and Plan stay free. The Forge, Coach, rewards and Future Self are locked.</p>
+<button class="pill" style="align-self: flex-start" onClick="{{openPaywall}}">See plans</button>
+</div>
+</sc-if>
+
+<sc-if value="{{sunday}}" hint-placeholder-val="{{false}}">
+<button class="card row" style="margin-top: 20px; width: 100%; text-align: left; border: 1px solid rgba(201,162,39,.45)" onClick="{{openReview}}">
+<div class="sicon" style="background: #C9A227; color: #0E0E10"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6"></path></svg></div>
+<span class="col" style="flex: 1"><span style="font-weight: 600">Sunday review</span><span class="muted small">3 questions. 2 minutes. Then plan next week.</span></span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+</sc-if>
+
+<div class="card" style="margin-top: 20px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<div class="row" style="gap: 20px">
+<div style="position: relative; width: 112px; height: 112px; flex: none">
+<svg viewBox="0 0 120 120" style="width: 112px; height: 112px; transform: rotate(-90deg)" aria-hidden="true">
+<circle cx="60" cy="60" r="50" fill="none" stroke="#26262B" stroke-width="12"></circle>
+<circle class="ringc" cx="60" cy="60" r="50" fill="none" stroke="#C9A227" stroke-width="12" stroke-linecap="round" style="stroke-dasharray: 314.16; stroke-dashoffset: {{ringOff}}"></circle>
+</svg>
+<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em">{{doneCount}}/{{visCount}}</span><span class="muted small">floors</span></div>
+</div>
+<div class="col" style="gap: 6px; flex: 1"><span style="font-size: 18px; font-weight: 600; line-height: 1.25">{{ringTitle}}</span><span class="muted small">{{ringSub}}</span></div>
+</div>
+<button class="row" style="width: 100%; text-align: left; padding-top: 14px; border-top: 1px solid #26262B; gap: 10px" onClick="{{goPlan}}">
+<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; color: #A6A6AE"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg>
+<span class="col" style="flex: 1; min-width: 0"><span class="small" style="font-weight: 600">{{nextTitle}}</span><span class="muted small">{{nextBody}}</span></span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+</div>
+
+<p class="glabel"><span>Floors</span><span style="text-transform: none; letter-spacing: 0; font-weight: 400">Tap to clear</span></p>
+<div class="stack" style="gap: 10px">
+<sc-for list="{{todayFloors}}" as="f" hint-placeholder-count="4">
+<div class="{{f.rowCls}}">
+<button class="floorMain" aria-pressed="{{f.done}}" onClick="{{f.toggle}}">
+<span class="{{f.cbCls}}"><sc-if value="{{f.done}}" hint-placeholder-val="{{false}}"><svg class="ic pop" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg></sc-if></span>
+<span class="col" style="min-width: 0; text-align: left">
+<span class="{{f.sentCls}}">{{f.sentence}}</span>
+<span class="fact">{{f.action}}</span>
+<sc-if value="{{f.hasExtra}}" hint-placeholder-val="{{false}}"><span class="fextra">{{f.extra}}</span></sc-if>
+<sc-if value="{{f.hasReward}}" hint-placeholder-val="{{false}}"><span class="frew"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>{{f.rewardLine}}</span></sc-if>
+</span>
+</button>
+<sc-if value="{{f.done}}" hint-placeholder-val="{{false}}"><button class="proofbtn" aria-label="{{f.proofAria}}" onClick="{{f.openProof}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg></button></sc-if>
+<button class="lockbtn" aria-label="{{f.lockAria}}" onClick="{{f.openReward}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></button>
+</div>
+</sc-for>
+</div>
+
+<sc-if value="{{hasTodayTasks}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<p class="glabel"><span>Also today</span><button class="small" style="text-transform: none; letter-spacing: 0; font-weight: 400; color: #A6A6AE; min-height: 32px" onClick="{{goPlan}}">Open Plan</button></p>
+<div class="group">
+<sc-for list="{{todayTasks}}" as="t" hint-placeholder-count="2">
+<button class="srow" aria-pressed="{{t.done}}" onClick="{{t.toggle}}">
+<span class="{{t.cbCls}}" style="width: 24px; height: 24px"><sc-if value="{{t.done}}" hint-placeholder-val="{{false}}"><svg class="ic pop" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg></sc-if></span>
+<span class="slabel">{{t.title}}</span><span class="sval small">{{t.time}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<div class="card row" style="margin-top: 20px; justify-content: space-between; padding: 18px 18px 18px 20px">
+<div class="col" style="gap: 4px"><span class="eyebrow">Skipped spends</span><span class="big">{{skipTodayFmt}}</span><span class="muted small">{{skipMonthLine}}</span></div>
+<button class="fab" aria-label="Log a skipped spend" onClick="{{openSkip}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="stroke-width: 2.4"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+
+<div class="card row" style="margin-top: 12px">
+<div class="{{closeIconCls}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg></div>
+<span class="col" style="flex: 1; min-width: 0"><span style="font-weight: 600">{{closeTitle}}</span><span class="muted small">{{closeSub}}</span></span>
+<sc-if value="{{closeCanStart}}" hint-placeholder-val="{{true}}"><button class="{{closePillCls}}" onClick="{{openClose}}">{{closePill}}</button></sc-if>
+</div>
+</div>
+</sc-if>
+
+<!-- PLAN -->
+<sc-if value="{{tabPlan}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="pane" style="padding-bottom: 96px">
+<div class="row" style="justify-content: space-between; align-items: flex-end">
+<div class="col"><span class="eyebrow">{{planMonth}}</span><h1 class="h1" style="margin-top: 4px">Plan</h1></div>
+<button class="pill" onClick="{{planToday}}">Today</button>
+</div>
+<div class="days" style="margin-top: 18px">
+<sc-for list="{{weekDays}}" as="d" hint-placeholder-count="7">
+<button class="{{d.cls}}" aria-pressed="{{d.on}}" aria-label="{{d.aria}}" onClick="{{d.pick}}"><span class="dw">{{d.wd}}</span><span class="dn">{{d.num}}</span><span class="{{d.dotCls}}"></span></button>
+</sc-for>
+</div>
+<div class="row" style="justify-content: space-between; margin: 22px 4px 12px">
+<span style="font-weight: 600; font-size: 17px">{{planDayLabel}}</span>
+<sc-if value="{{planEdited}}" hint-placeholder-val="{{false}}"><span class="soon" style="color: #C9A227; border-color: rgba(201,162,39,.5)">CHANGED FOR THIS DAY</span></sc-if>
+</div>
+<div class="stack" style="gap: 8px">
+<sc-for list="{{timeline}}" as="i" hint-placeholder-count="8">
+<div class="tl2">
+<span class="tlt">{{i.time}}</span>
+<sc-if value="{{i.isAnchor}}" hint-placeholder-val="{{true}}">
+<button class="tlcard" onClick="{{i.edit}}" aria-label="{{i.aria}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span>
+<span class="col" style="flex: 1; min-width: 0"><span style="font-weight: 600">{{i.title}}</span><sc-if value="{{i.hasSub}}" hint-placeholder-val="{{false}}"><span class="muted small">{{i.sub}}</span></sc-if></span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+</sc-if>
+<sc-if value="{{i.isNudge}}" hint-placeholder-val="{{false}}">
+<div class="tlnudge"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg><span>{{i.title}}</span></div>
+</sc-if>
+<sc-if value="{{i.isTask}}" hint-placeholder-val="{{false}}">
+<div class="tlcard" style="padding: 0 6px 0 0">
+<button class="iconbtn" style="width: 52px; height: 56px" aria-label="{{i.aria}}" onClick="{{i.toggle}}"><span class="{{i.cbCls}}" style="width: 24px; height: 24px"><sc-if value="{{i.done}}" hint-placeholder-val="{{false}}"><svg class="ic pop" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg></sc-if></span></button>
+<button class="col" style="flex: 1; min-width: 0; min-height: 56px; justify-content: center; text-align: left" onClick="{{i.edit}}"><span style="font-weight: 600">{{i.title}}</span><span class="muted small">{{i.sub}}</span></button>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+<button class="planfab" aria-label="Add a task" onClick="{{openNewTask}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="stroke-width: 2.4"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+</sc-if>
+
+<!-- PROGRESS -->
+<sc-if value="{{tabProgress}}" hint-placeholder-val="{{false}}">
+<div class="pane">
+<h1 class="h1">Progress</h1>
+
+<p class="glabel"><span class="row" style="gap: 8px">Coach <span class="protag">PRO</span></span></p>
+<sc-if value="{{coachLocked}}" hint-placeholder-val="{{false}}">
+<button class="card row" style="width: 100%; text-align: left" onClick="{{openPaywall}}">
+<div class="sicon" style="color: #C9A227"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div>
+<span class="col" style="flex: 1"><span style="font-weight: 600">Patterns in your misses, and what to do</span><span class="muted small">One sharp insight a week, from your own data.</span></span>
+</button>
+</sc-if>
+<sc-if value="{{coachWaiting}}" hint-placeholder-val="{{false}}">
+<div class="card"><p style="font-weight: 600">Your first insight lands on Day 3.</p><p class="muted small" style="margin-top: 4px">Coach needs a few days of your floors and misses to spot a real pattern.</p></div>
+</sc-if>
+<sc-if value="{{coachShow}}" hint-placeholder-val="{{false}}">
+<div class="card" style="display: flex; flex-direction: column; gap: 12px; border: 1px solid #2C2C32">
+<span class="eyebrow">Pattern spotted</span>
+<p style="font-size: 17px; font-weight: 600; line-height: 1.35">{{coachText}}</p>
+<p class="muted small">{{coachWhy}}</p>
+<sc-if value="{{coachOpen}}" hint-placeholder-val="{{true}}">
+<div class="row" style="gap: 8px; flex-wrap: wrap">
+<button class="pill gold" onClick="{{coachShrink}}">Shrink Friday's floor</button>
+<button class="pill" onClick="{{coachMove}}">Move it to Saturday</button>
+</div>
+</sc-if>
+<sc-if value="{{coachDoneOn}}" hint-placeholder-val="{{false}}">
+<div class="row" style="gap: 8px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; color: #4CAF7A; stroke-width: 2.6"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg><span class="small">{{coachResult}}</span></div>
+</sc-if>
+</div>
+</sc-if>
+
+<p class="glabel"><span>Who you're becoming</span><span style="text-transform: none; letter-spacing: 0; font-weight: 400">Votes</span></p>
+<div class="card" style="display: flex; flex-direction: column; gap: 16px">
+<sc-for list="{{identityVotes}}" as="iv" hint-placeholder-count="2">
+<div class="col" style="gap: 8px">
+<div class="row" style="justify-content: space-between"><span style="font-weight: 600">{{iv.name}}</span><span class="small"><span style="font-weight: 600">{{iv.total}}</span><span class="muted"> · {{iv.week}}</span></span></div>
+<div class="vbar"><div class="vfill" style="width: {{iv.pct}}%"></div></div>
+</div>
+</sc-for>
+<p class="muted small">Every floor you clear is a vote for the person you said you're becoming.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+<div class="stat"><span class="muted small">Streak</span><span class="v gold">{{streak}}</span><span class="muted small">days</span></div>
+<div class="stat"><span class="muted small">Best</span><span class="v">{{best}}</span><span class="muted small">days</span></div>
+<div class="stat"><span class="muted small">Cleared</span><span class="v">{{clearedTotal}}</span><span class="muted small">floors</span></div>
+</div>
+
+<p class="glabel"><span>Consistency · 12 weeks</span></p>
+<div class="stack">
+<sc-for list="{{gridFloors}}" as="f" hint-placeholder-count="3">
+<div class="card" style="display: flex; flex-direction: column; gap: 12px">
+<div class="row" style="justify-content: space-between"><span style="font-weight: 600">{{f.action}}</span><span class="muted small">{{f.rate}}</span></div>
+<div class="grid" role="img" aria-label="{{f.gridAria}}">
+<sc-for list="{{f.cells}}" as="c" hint-placeholder-count="84">
+<div class="{{c.cls}}"><sc-if value="{{c.shield}}" hint-placeholder-val="{{false}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6l7-3z"></path></svg></sc-if></div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div class="row muted small" style="gap: 16px; padding: 0 4px">
+<span class="row" style="gap: 6px"><span class="cell d" style="width: 12px; height: 12px"></span>Done</span>
+<span class="row" style="gap: 6px"><span class="cell" style="width: 12px; height: 12px"></span>Missed</span>
+<span class="row" style="gap: 6px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; color: #C9A227"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6l7-3z"></path></svg>Shielded</span>
+</div>
+</div>
+
+<p class="glabel"><span class="row" style="gap: 8px">The 66-day Forge <span class="protag">PRO</span></span></p>
+<sc-if value="{{pro}}" hint-placeholder-val="{{true}}">
+<div class="stack">
+<sc-for list="{{forgeFloors}}" as="f" hint-placeholder-count="3">
+<div class="card" style="display: flex; flex-direction: column; gap: 12px">
+<div class="row" style="justify-content: space-between"><span style="font-weight: 600">{{f.action}}</span><span class="{{f.labelCls}}">{{f.label}}</span></div>
+<div class="bar"><div class="barfill" style="width: {{f.pct}}%"></div><div class="tick"></div></div>
+<div class="row muted small" style="justify-content: space-between"><span>Day 1</span><span>33</span><span>66</span></div>
+</div>
+</sc-for>
+<sc-if value="{{forgeEmpty}}" hint-placeholder-val="{{false}}"><div class="card muted">Every floor is Automatic. Add a new one from Focus.</div></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{notPro}}" hint-placeholder-val="{{false}}">
+<button class="card row" style="width: 100%; text-align: left" onClick="{{openPaywall}}">
+<div class="sicon" style="color: #C9A227"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div>
+<span class="col" style="flex: 1"><span style="font-weight: 600">See when each floor turns automatic</span><span class="muted small">66 days of reps, tracked per floor.</span></span>
+</button>
+</sc-if>
+
+<sc-if value="{{hasAuto}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<p class="glabel"><span>Automatic</span></p>
+<div class="stack" style="gap: 10px">
+<sc-for list="{{autoFloors}}" as="f" hint-placeholder-count="1">
+<div class="card row">
+<div style="width: 44px; height: 44px; border-radius: 22px; border: 2px solid #C9A227; color: #C9A227; display: flex; align-items: center; justify-content: center; flex: none"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="6"></circle><path d="M8.5 13.5L7 21l5-2.5 5 2.5-1.5-7.5"></path></svg></div>
+<span class="col"><span style="font-weight: 600">{{f.action}}</span><span class="muted small">{{f.sub}}</span></span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<p class="glabel"><span>Savings</span></p>
+<div class="card" style="display: flex; flex-direction: column; gap: 14px">
+<div class="row" style="justify-content: space-between; align-items: flex-end">
+<div class="col"><span class="muted small">Total saved</span><span class="big">{{totalFmt}}</span></div>
+<div class="col" style="align-items: flex-end"><span class="muted small">{{futureAgeLabel}}</span><span class="gold" style="font-size: 20px; font-weight: 600">{{futureFmt}}</span></div>
+</div>
+<sc-if value="{{hasChart}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<svg viewBox="0 0 310 110" style="width: 100%; height: 110px" role="img" aria-label="{{chartAria}}">
+<line x1="0" y1="105" x2="310" y2="105" stroke="#26262B" stroke-width="1"></line>
+<polyline points="{{chartPts}}" fill="none" stroke="#C9A227" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+<circle cx="{{chartLastX}}" cy="{{chartLastY}}" r="5" fill="#C9A227"></circle>
+</svg>
+<div class="row muted small" style="justify-content: space-between">
+<sc-for list="{{chartLabels}}" as="m" hint-placeholder-count="6"><span>{{m}}</span></sc-for>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{noChart}}" hint-placeholder-val="{{false}}"><p class="muted">Your line starts with your first skipped spend. Tap + on Today.</p></sc-if>
+<div class="row" style="justify-content: space-between; padding-top: 12px; border-top: 1px solid #26262B">
+<span class="col"><span style="font-weight: 600">Monthly transfer · {{saveAmtFmt}}</span><span class="muted small">{{transferSub}}</span></span>
+<button class="{{transferCls}}" aria-pressed="{{transferDone}}" onClick="{{toggleTransfer}}">{{transferBtn}}</button>
+</div>
+<p class="muted small">{{skipMonthLine}}</p>
+</div>
+</div>
+</sc-if>
+
+<!-- YOU -->
+<sc-if value="{{tabYou}}" hint-placeholder-val="{{false}}">
+<div class="pane">
+<div class="row" style="gap: 16px">
+<div class="avatar">A</div>
+<div class="col"><span class="h2">Abbu</span><span class="muted small">Member since {{memberSince}}</span></div>
+</div>
+<div class="chips" style="margin-top: 16px">
+<sc-for list="{{identityTags}}" as="t" hint-placeholder-count="2"><span class="chip sm on">{{t}}</span></sc-for>
+</div>
+
+<p class="glabel"><span>Your system</span></p>
+<div class="group">
+<button class="srow" onClick="{{openFocus}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l8 4-8 4-8-4 8-4z"></path><path d="M4 12l8 4 8-4"></path><path d="M4 16l8 4 8-4"></path></svg></span>
+<span class="slabel">Focus and idea inbox</span><span class="sval">{{ideaVal}}</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+<button class="srow" onClick="{{goPlan}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span>
+<span class="slabel">Daily routine</span><span class="sval">{{routineVal}}</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+<button class="srow" onClick="{{openFuture}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect><path d="M4 7l8 6 8-6"></path></svg></span>
+<span class="slabel">Future Self</span>
+<sc-if value="{{pro}}" hint-placeholder-val="{{true}}"><span class="sval">{{futureFmt}}</span></sc-if>
+<sc-if value="{{notPro}}" hint-placeholder-val="{{false}}"><svg class="ic lockmini" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></sc-if>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+</div>
+
+<p class="glabel"><span>People</span></p>
+<div class="group">
+<button class="srow" onClick="{{openPartner}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"></circle><circle cx="16.5" cy="10" r="2.6"></circle><path d="M3.5 19c.9-3 3-4.5 5.5-4.5s4.6 1.5 5.5 4.5M15 15c2.6-.4 4.6 1 5.4 3.6"></path></svg></span>
+<span class="slabel">Accountability partner</span><span class="sval">{{partnerVal}}</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+<button class="srow" onClick="{{openPair}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="3"></circle><circle cx="16" cy="12" r="3"></circle><path d="M11 12h2"></path></svg></span>
+<span class="slabel">Weekly pair</span><span class="soon">{{pairTag}}</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+</div>
+
+<p class="glabel"><span>Account</span></p>
+<div class="group">
+<div class="srow">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg></span>
+<span class="slabel">Nudges</span>
+<button class="{{notifSwCls}}" role="switch" aria-checked="{{notif}}" aria-label="Nudges" onClick="{{toggleNotif}}"><span class="knob"></span></button>
+</div>
+<button class="srow" onClick="{{openWidget}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></span>
+<span class="slabel">Home screen widget</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+<button class="srow" onClick="{{openSub}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6" width="17" height="12" rx="2"></rect><path d="M3.5 10h17"></path></svg></span>
+<span class="slabel">Subscription</span><span class="sval">{{subVal}}</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+<button class="srow" onClick="{{openHelp}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 0 1 4.8.8c0 1.7-2.4 2-2.4 3.7"></path><path d="M12 17h.01"></path></svg></span>
+<span class="slabel">Help</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+</div>
+
+<p class="glabel"><span>Coming soon</span></p>
+<div class="group">
+<button class="srow" onClick="{{openStakes}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M16 7.5c0-1.4-1.8-2.5-4-2.5s-4 1.1-4 2.5S9.8 10 12 10.5s4 1.1 4 2.5-1.8 2.5-4 2.5-4-1.1-4-2.5"></path></svg></span>
+<span class="slabel">Stakes</span><span class="soon">{{stakesTag}}</span>
+<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg>
+</button>
+</div>
+
+<p class="glabel"><span>Demo · jump to a state</span><span style="text-transform: none; letter-spacing: 0; font-weight: 400">Prototype only</span></p>
+<div class="group">
+<sc-for list="{{demoRows}}" as="d" hint-placeholder-count="7">
+<button class="srow" onClick="{{d.go}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="8 5 19 12 8 19 8 5"></polygon></svg></span>
+<span class="slabel">{{d.label}}</span><span class="sval small">{{d.hint}}</span>
+</button>
+</sc-for>
+</div>
+<p class="glabel"><span>Demo · send a nudge</span></p>
+<div class="group">
+<sc-for list="{{demoNudges}}" as="d" hint-placeholder-count="6">
+<button class="srow" onClick="{{d.go}}">
+<span class="sicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg></span>
+<span class="slabel">{{d.label}}</span><span class="sval small">{{d.hint}}</span>
+</button>
+</sc-for>
+</div>
+<p class="muted small" style="text-align: center; margin-top: 20px">ARENA 1.1 · prototype</p>
+</div>
+</sc-if>
+
+<!-- TAB BAR -->
+<nav class="tabbar" aria-label="Tabs">
+<button class="{{tabTodayCls}}" onClick="{{goToday}}" aria-current="{{tabToday}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><polyline points="8.5 12 11 14.5 15.5 9.5"></polyline></svg>Today</button>
+<button class="{{tabPlanCls}}" onClick="{{goPlan}}" aria-current="{{tabPlan}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Plan</button>
+<button class="{{tabProgressCls}}" onClick="{{goProgress}}" aria-current="{{tabProgress}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6"></path></svg>Progress</button>
+<button class="{{tabYouCls}}" onClick="{{goYou}}" aria-current="{{tabYou}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.2-3.8 4-5.5 7.5-5.5s6.3 1.7 7.5 5.5"></path></svg>You</button>
+</nav>
+</div>
+</sc-if>
+
+<!-- ============ FOCUS & IDEA INBOX ============ -->
+<sc-if value="{{isFocus}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="topbar" style="padding-bottom: 6px">
+<button class="iconbtn" aria-label="Back" onClick="{{focusBack}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 5 8 12 15 19"></polyline></svg></button>
+<span style="font-weight: 600; font-size: 17px">Focus</span>
+</div>
+<div class="body">
+<p class="glabel" style="margin-top: 8px"><span>Idea inbox</span><span style="text-transform: none; letter-spacing: 0; font-weight: 400">14-day cooldown</span></p>
+<div class="card" style="display: flex; flex-direction: column; gap: 14px">
+<p class="muted small">New ideas wait here. If you're still excited after 14 days, they can earn a spot.</p>
+<div class="row" style="gap: 10px">
+<label class="sr" for="ideain">New idea</label>
+<input id="ideain" class="input" style="background: #1E1E22" placeholder="Park a new idea" value="{{ideaDraft}}" onChange="{{onIdeaDraft}}">
+<button class="addbtn" style="background: #1E1E22" aria-label="Park idea" onClick="{{parkIdea}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+<sc-for list="{{ideaRows}}" as="d" hint-placeholder-count="2">
+<div class="col" style="gap: 8px; padding-top: 12px; border-top: 1px solid #26262B">
+<div class="row" style="justify-content: space-between">
+<span class="col"><span style="font-weight: 600">{{d.name}}</span><span class="{{d.subCls}}">{{d.sub}}</span></span>
+<sc-if value="{{d.ready}}" hint-placeholder-val="{{false}}"><button class="pill gold" onClick="{{d.decide}}">Decide</button></sc-if>
+</div>
+<sc-if value="{{d.cooling}}" hint-placeholder-val="{{true}}"><div class="vbar"><div class="vfill" style="width: {{d.pct}}%; background: #6A6A72"></div></div></sc-if>
+</div>
+</sc-for>
+<sc-if value="{{noIdeas}}" hint-placeholder-val="{{false}}"><p class="empty">Nothing cooling. That's a good sign.</p></sc-if>
+</div>
+
+<p class="glabel"><span>Tier 1 · Daily focus</span><span>{{t1Count}}/2</span></p>
+<div class="stack">
+<sc-for list="{{t1Cards}}" as="c" hint-placeholder-count="2">
+<div class="card" style="display: flex; flex-direction: column; gap: 10px">
+<span class="h2">{{c.name}}</span>
+<sc-for list="{{c.floors}}" as="f" hint-placeholder-count="1">
+<button class="row" style="width: 100%; min-height: 44px; text-align: left" aria-pressed="{{f.done}}" onClick="{{f.toggle}}">
+<span class="{{f.cbCls}}" style="width: 24px; height: 24px"><sc-if value="{{f.done}}" hint-placeholder-val="{{false}}"><svg class="ic pop" viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg></sc-if></span>
+<span class="col" style="flex: 1"><span style="font-weight: 600">{{f.action}}</span><span class="muted small">{{f.whenLine}}</span></span>
+</button>
+</sc-for>
+<sc-if value="{{c.noFloors}}" hint-placeholder-val="{{false}}"><span class="muted small">No floor yet.</span></sc-if>
+</div>
+</sc-for>
+<sc-if value="{{t1Empty}}" hint-placeholder-val="{{false}}"><div class="card muted">Nothing in daily focus. Promote something below.</div></sc-if>
+</div>
+
+<p class="glabel"><span>Tier 2 · Weekly check-in</span></p>
+<div class="stack" style="gap: 10px">
+<sc-for list="{{t2Cards}}" as="c" hint-placeholder-count="1">
+<div class="card row" style="justify-content: space-between; padding: 12px 12px 12px 16px">
+<span class="col"><span style="font-weight: 600; font-size: 16px">{{c.name}}</span><span class="muted small">{{c.status}}</span></span>
+<button class="pill" onClick="{{c.review}}">Review</button>
+</div>
+</sc-for>
+<sc-if value="{{t2Empty}}" hint-placeholder-val="{{false}}"><div class="card muted">Nothing here.</div></sc-if>
+</div>
+
+<p class="glabel"><span>Tier 3 · Parked</span></p>
+<div class="stack" style="gap: 10px">
+<sc-for list="{{t3Cards}}" as="c" hint-placeholder-count="2">
+<div class="row" style="justify-content: space-between; padding: 12px 12px 12px 16px; border-radius: 16px; background: rgba(24,24,27,.5); border: 1px dashed #26262B">
+<span style="font-weight: 600; font-size: 16px; color: #8C8C94">{{c.name}}</span>
+<button class="pill" onClick="{{c.promote}}">Promote</button>
+</div>
+</sc-for>
+<sc-if value="{{t3Empty}}" hint-placeholder-val="{{false}}"><div class="card muted">Nothing parked.</div></sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ CLOSE THE DAY ============ -->
+<sc-if value="{{isClose}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="topbar">
+<button class="iconbtn" aria-label="Back to Today" onClick="{{backToApp}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div class="track"><div class="fill" style="width: {{closePct}}%"></div></div>
+<span class="muted small" style="width: 36px; text-align: right">{{closeStepLabel}}</span>
+</div>
+<sc-if value="{{close0}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<div class="body">
+<span class="eyebrow">Close the day · {{nowLabel}}</span>
+<h1 class="h1" style="margin-top: 8px">Here's today.</h1>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 22px">
+<div class="stat"><span class="muted small">Floors cleared</span><span class="v">{{doneCount}}/{{visCount}}</span></div>
+<div class="stat"><span class="muted small">Votes cast</span><span class="v gold">+{{votesToday}}</span></div>
+<div class="stat"><span class="muted small">Skipped spends</span><span class="v">{{skipTodayFmt}}</span></div>
+<div class="stat"><span class="muted small">Tasks done</span><span class="v">{{tasksDoneLabel}}</span></div>
+</div>
+<div class="card" style="margin-top: 12px"><p style="font-weight: 600">{{closeVerdict}}</p><p class="muted small" style="margin-top: 4px">{{closeVerdictSub}}</p></div>
+<sc-if value="{{closeHasOpen}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<p class="eyebrow" style="margin: 22px 0 10px">Still open. Tap if you did it.</p>
+<div class="stack" style="gap: 8px">
+<sc-for list="{{closeOpenFloors}}" as="f" hint-placeholder-count="2">
+<button class="opt" onClick="{{f.toggle}}"><span class="cb" style="width: 24px; height: 24px"></span><span style="font-weight: 600">{{f.action}}</span></button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</div>
+<div class="foot"><button class="btn" onClick="{{closeNext}}">Next</button></div>
+</div>
+</sc-if>
+<sc-if value="{{close1}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<span class="eyebrow">Close the day</span>
+<h1 class="h1" style="margin-top: 8px">What happened today?</h1>
+<label class="sr" for="closeta">What happened today</label>
+<textarea id="closeta" class="ta" style="margin-top: 22px" placeholder="A line is enough. What moved, what didn't." value="{{closeNote}}" onChange="{{onCloseNote}}"></textarea>
+<div class="chips" style="margin-top: 14px">
+<sc-for list="{{closeChips}}" as="c" hint-placeholder-count="4"><button class="chip sm" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+</div>
+</div>
+<div class="foot"><button class="btn" onClick="{{closeNext}}">{{closeNoteBtn}}</button></div>
+</div>
+</sc-if>
+<sc-if value="{{close2}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<span class="eyebrow">Close the day</span>
+<h1 class="h1" style="margin-top: 8px">Plan tomorrow.</h1>
+<p class="sub">{{tomorrowLabel}}</p>
+<div class="card" style="margin-top: 18px; display: flex; flex-direction: column; gap: 10px">
+<div class="row" style="justify-content: space-between"><span class="muted">Wake up</span><span style="font-weight: 600">{{tmWake}}</span></div>
+<div class="row" style="justify-content: space-between"><span class="muted">Lunch</span><span style="font-weight: 600">{{tmLunch}}</span></div>
+<div class="row" style="justify-content: space-between"><span class="muted">Close the day</span><span style="font-weight: 600">{{tmCheckin}}</span></div>
+<button class="small" style="color: #A6A6AE; text-align: left; min-height: 32px" onClick="{{changeTomorrow}}">Tomorrow looks different? Change times</button>
+</div>
+<p class="eyebrow" style="margin: 22px 0 10px">Tomorrow's tasks</p>
+<div class="group">
+<sc-for list="{{tomorrowTasks}}" as="t" hint-placeholder-count="1">
+<div class="srow"><span class="slabel">{{t.title}}</span><span class="sval small">{{t.time}}</span></div>
+</sc-for>
+<sc-if value="{{noTomorrowTasks}}" hint-placeholder-val="{{false}}"><div class="srow"><span class="muted">Nothing yet. Add the one thing.</span></div></sc-if>
+</div>
+<div class="row" style="margin-top: 12px; gap: 10px">
+<label class="sr" for="tmtask">Add a task for tomorrow</label>
+<input id="tmtask" class="input" placeholder="Add a task for tomorrow" value="{{tmDraft}}" onChange="{{onTmDraft}}">
+<button class="addbtn" aria-label="Add task for tomorrow" onClick="{{addTmTask}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+<div class="chips" style="margin-top: 10px">
+<sc-for list="{{tmTimeChips}}" as="c" hint-placeholder-count="4"><button class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+</div>
+</div>
+<div class="foot"><button class="btn" onClick="{{closeFinish}}">Close the day</button></div>
+</div>
+</sc-if>
+<sc-if value="{{close3}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="center">
+<div class="pop" style="width: 88px; height: 88px; border-radius: 44px; border: 3px solid #C9A227; color: #C9A227; display: flex; align-items: center; justify-content: center"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 40px; height: 40px"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg></div>
+<h1 class="h1" style="margin-top: 16px; font-size: 34px">Day closed.</h1>
+<p class="sub" style="margin-top: 0">{{closedLine}}</p>
+</div>
+<div class="foot"><button class="btn" onClick="{{backToApp}}">Done</button></div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<!-- ============ CELEBRATION ============ -->
+<sc-if value="{{isCelebrate}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="topbar" style="padding-bottom: 0"><button class="iconbtn" aria-label="Back to Today" onClick="{{backToApp}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="center">
+<svg class="flameBig icf" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4.8 5.6 4.8 10.4a4.8 4.8 0 0 1-9.6 0c0-2.2 1-3.7 2.2-4.9.1 1.8.9 3 2 3.4-.4-3.1-.2-5.9.6-8.9z"></path></svg>
+<div class="countup" style="font-size: 64px; font-weight: 600; letter-spacing: -0.03em; color: #C9A227; line-height: 1">{{streak}}</div>
+<p class="muted">day streak</p>
+<h1 class="h1" style="margin-top: 24px; font-size: 34px">Floors cleared.</h1>
+<p class="sub" style="margin-top: 0; font-size: 18px; color: #F2EFE9">{{celebrateLine}}</p>
+<p class="gold" style="font-weight: 600">{{celebrateVotes}}</p>
+</div>
+<div class="foot"><button class="btn" onClick="{{celebrateDone}}">Done</button></div>
+</div>
+</sc-if>
+
+<!-- ============ COMEBACK ============ -->
+<sc-if value="{{isComeback}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="topbar" style="padding-bottom: 0"><button class="iconbtn" aria-label="Back to Today" onClick="{{backToApp}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="body" style="padding-top: 8px">
+<span class="eyebrow">Welcome back</span>
+<h1 class="h1" style="margin-top: 8px">Yesterday slipped. Today counts.</h1>
+<div class="card" style="margin-top: 20px; padding: 18px">
+<p style="font-size: 16px; line-height: 1.5">Nadia missed four mornings of her run after a brutal week. On day five she laced up and walked one block. That block was the whole comeback.</p>
+</div>
+<div class="row" style="margin-top: 12px; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(201,162,39,.45); gap: 12px">
+<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color: #C9A227"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6l7-3z"></path></svg>
+<span style="font-size: 15px">{{shieldLine}}</span>
+</div>
+<p class="eyebrow" style="margin: 26px 0 12px">What got in the way?</p>
+<div class="chips">
+<sc-for list="{{reasonChips}}" as="c" hint-placeholder-count="4">
+<button class="{{c.cls}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button>
+</sc-for>
+</div>
+<p class="muted small" style="margin-top: 10px">Coach uses this to spot patterns, never to judge.</p>
+<div class="card" style="margin-top: 20px; display: flex; flex-direction: column; gap: 14px">
+<div class="row" style="justify-content: space-between">
+<span style="font-weight: 600; font-size: 16px">Set tomorrow's floor smaller?</span>
+<button class="{{shrinkSwCls}}" role="switch" aria-checked="{{shrink}}" aria-label="Make the floor smaller" onClick="{{toggleShrink}}"><span class="knob"></span></button>
+</div>
+<div class="row" style="gap: 10px; min-height: 28px">
+<span class="{{oldFloorCls}}" style="font-weight: 600">{{shrinkFrom}}</span>
+<sc-if value="{{shrink}}" hint-placeholder-val="{{false}}">
+<div class="row" style="gap: 10px">
+<svg class="ic newfloor" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; color: #A6A6AE"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+<span class="newfloor" style="font-weight: 600; font-size: 17px">{{shrinkTo}}</span>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+<div class="foot"><button class="btn" onClick="{{imBack}}">I'm back</button></div>
+</div>
+</sc-if>
+
+<!-- ============ FRESH START ============ -->
+<sc-if value="{{isFresh}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="topbar" style="padding-bottom: 0"><button class="iconbtn" aria-label="Back to Today" onClick="{{backToApp}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="body" style="padding-top: 40px">
+<span class="eyebrow">Fresh start</span>
+<h1 class="h1" style="margin-top: 8px; font-size: 40px; line-height: 1.08">New week.<br>Clean slate.</h1>
+<p class="sub">You've been away a few days. Nothing is lost. Your floors are right here, and they're still small.</p>
+<div class="stack" style="margin-top: 28px; gap: 10px">
+<sc-for list="{{todayFloors}}" as="f" hint-placeholder-count="4">
+<div class="card row" style="padding: 14px 16px"><span class="cb" style="width: 22px; height: 22px"></span><span style="font-weight: 600">{{f.action}}</span></div>
+</sc-for>
+</div>
+</div>
+<div class="foot"><button class="btn" onClick="{{restart}}">Restart</button></div>
+</div>
+</sc-if>
+
+<!-- ============ GRADUATION ============ -->
+<sc-if value="{{isGraduate}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="topbar" style="padding-bottom: 0"><button class="iconbtn" aria-label="Back to Today" onClick="{{backToApp}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div class="center">
+<div class="pop" style="width: 120px; height: 120px; border-radius: 60px; border: 3px solid #C9A227; color: #C9A227; display: flex; align-items: center; justify-content: center"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 56px; height: 56px; stroke-width: 1.5"><circle cx="12" cy="9" r="6"></circle><path d="M8.5 13.5L7 21l5-2.5 5 2.5-1.5-7.5"></path></svg></div>
+<span class="eyebrow" style="margin-top: 18px">Day 66 of 66</span>
+<h1 class="h1" style="font-size: 34px">{{gradTitle}}</h1>
+<p class="sub" style="margin-top: 0">66 days of showing up. It's on your Automatic shelf now. Ready to raise the floor?</p>
+</div>
+<div class="foot">
+<button class="btn" onClick="{{raiseFloor}}">{{raiseBtn}}</button>
+<button class="link" onClick="{{keepAuto}}">Keep it automatic</button>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ WEEKLY REVIEW ============ -->
+<sc-if value="{{isReview}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="topbar">
+<button class="iconbtn" aria-label="Close review" onClick="{{closeReview}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div class="track"><div class="fill" style="width: {{reviewPct}}%"></div></div>
+<span class="muted small" style="width: 36px; text-align: right">{{reviewStepLabel}}</span>
+</div>
+<sc-if value="{{reviewAsking}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<div class="body">
+<span class="eyebrow">Sunday review</span>
+<h1 class="h1" style="margin-top: 8px">{{reviewQ}}</h1>
+<label class="sr" for="reviewta">{{reviewQ}}</label>
+<textarea id="reviewta" class="ta" style="margin-top: 22px" placeholder="{{reviewPh}}" value="{{reviewVal}}" onChange="{{onReview}}"></textarea>
+<div class="chips" style="margin-top: 14px">
+<sc-for list="{{reviewChips}}" as="c" hint-placeholder-count="3"><button class="chip sm" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+</div>
+</div>
+<div class="foot"><button class="btn" disabled="{{reviewDis}}" onClick="{{reviewNext}}">{{reviewBtn}}</button></div>
+</div>
+</sc-if>
+<sc-if value="{{reviewShare}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="body">
+<h1 class="h1">Your week.</h1>
+<div class="share" style="margin-top: 20px">
+<div class="row" style="justify-content: space-between"><span class="wm gold">ARENA</span><span class="muted small">{{weekLabel}}</span></div>
+<div class="col"><span style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em">Abbu</span><span class="muted">{{recapIds}}</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px">
+<div class="col"><span class="muted small">Floors cleared</span><span style="font-size: 28px; font-weight: 600">{{weekFloors}}</span></div>
+<div class="col"><span class="muted small">Streak</span><span class="gold" style="font-size: 28px; font-weight: 600">{{streak}} days</span></div>
+<div class="col"><span class="muted small">Skipped spends</span><span style="font-size: 28px; font-weight: 600">{{weekSaved}}</span></div>
+<div class="col"><span class="muted small">Votes cast</span><span style="font-size: 28px; font-weight: 600">{{weekVotes}}</span></div>
+</div>
+<div style="height: 1px; background: #2C2C32"></div>
+<div class="col" style="gap: 4px"><span class="muted small">The one thing next week</span><span style="font-size: 18px; font-weight: 600">{{oneThing}}</span></div>
+</div>
+</div>
+<div class="foot">
+<button class="btn" onClick="{{sendPartner}}">Send to my partner</button>
+<button class="btn2" onClick="{{saveImage}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><path d="M12 4v11M8 11l4 4 4-4"></path><path d="M5 19h14"></path></svg>Save image</button>
+<button class="link" onClick="{{closeReview}}">Done</button>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<!-- ============ SHEETS ============ -->
+<sc-if value="{{hasSheet}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20">
+<button class="scrim" aria-label="Close" onClick="{{closeSheet}}"></button>
+<div class="sheet" role="dialog" aria-modal="true">
+<div class="grab"></div>
+
+<!-- Skipped spend -->
+<sc-if value="{{shSkip}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 4px"><span class="h2">What did you skip?</span><span class="muted">Every skipped spend goes to future you.</span></div>
+<div class="chips">
+<sc-for list="{{skipPresets}}" as="q" hint-placeholder-count="4"><button class="{{q.cls}}" onClick="{{q.pick}}">{{q.label}}</button></sc-for>
+</div>
+<div class="amount" style="text-align: center; padding: 4px 0">{{padFmt}}</div>
+<div class="pad">
+<sc-for list="{{padKeys}}" as="k" hint-placeholder-count="12">
+<button class="key" aria-label="{{k.aria}}" onClick="{{k.press}}">
+<sc-if value="{{k.isDel}}" hint-placeholder-val="{{false}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h10.5A1.5 1.5 0 0 1 21 7.5v9a1.5 1.5 0 0 1-1.5 1.5H9l-6-6 6-6z"></path><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"></path></svg></sc-if>
+<sc-if value="{{k.isNum}}" hint-placeholder-val="{{true}}">{{k.label}}</sc-if>
+</button>
+</sc-for>
+</div>
+<button class="btn" disabled="{{padDis}}" onClick="{{confirmSkip}}">{{padBtn}}</button>
+</div>
+</sc-if>
+
+<!-- Reward -->
+<sc-if value="{{shReward}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Lock a reward</span><span class="muted">It unlocks after <b style="color: #F2EFE9">{{rewardFloorName}}</b>. Earn it, then enjoy it guilt-free.</span></div>
+<label class="sr" for="rewardin">Reward</label>
+<input id="rewardin" class="input" style="flex: none; background: #1E1E22" placeholder="Next episode" value="{{rewardDraft}}" onChange="{{onRewardDraft}}">
+<div class="chips">
+<sc-for list="{{rewardChips}}" as="c" hint-placeholder-count="4"><button class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+</div>
+<button class="btn" disabled="{{rewardDis}}" onClick="{{saveReward}}">Lock it in</button>
+<sc-if value="{{rewardHasExisting}}" hint-placeholder-val="{{false}}"><button class="link" onClick="{{removeReward}}">Remove reward</button></sc-if>
+</div>
+</sc-if>
+
+<!-- Proof -->
+<sc-if value="{{shProof}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Add proof</span><span class="muted">Optional. A line or a photo makes today's {{proofFloorName}} feel real when you look back.</span></div>
+<label class="sr" for="proofin">Proof note</label>
+<input id="proofin" class="input" style="flex: none; background: #1E1E22" placeholder="What did you actually do?" value="{{proofDraft}}" onChange="{{onProofDraft}}">
+<button class="btn2" onClick="{{addPhoto}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><rect x="3.5" y="6.5" width="17" height="13" rx="2.5"></rect><circle cx="12" cy="13" r="3.5"></circle><path d="M9 6.5l1.5-2h3l1.5 2"></path></svg>{{photoBtn}}</button>
+<button class="btn" disabled="{{proofDis}}" onClick="{{saveProof}}">Save proof</button>
+</div>
+</sc-if>
+
+<!-- Paywall sheet -->
+<sc-if value="{{shPaywall}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Unlock ARENA Pro</span><span class="muted">The tools that turn floors into who you are.</span></div>
+<div class="stack" style="gap: 10px">
+<div class="row"><span class="tldot"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M5 20V11M12 20V5M19 20v-6"></path></svg></span><span>Coach insights from your own patterns</span></div>
+<div class="row"><span class="tldot"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><circle cx="12" cy="9" r="6"></circle><path d="M8.5 13.5L7 21l5-2.5 5 2.5-1.5-7.5"></path></svg></span><span>The 66-day Forge for every floor</span></div>
+<div class="row"><span class="tldot"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span><span>Locked rewards on any floor</span></div>
+<div class="row"><span class="tldot"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect><path d="M4 7l8 6 8-6"></path></svg></span><span>Future Self and a letter to you later</span></div>
+</div>
+<div class="stack" style="gap: 16px; margin-top: 8px">
+<button class="{{planAnnualCls}}" onClick="{{pickAnnual}}"><span class="radio"></span><span class="col" style="flex: 1"><span style="font-weight: 600">Annual</span><span class="muted small">$3.33/mo, billed yearly</span></span><span style="font-weight: 600">$39.99/yr</span><span class="tag">BEST VALUE</span></button>
+<button class="{{planMonthlyCls}}" onClick="{{pickMonthly}}"><span class="radio"></span><span class="col" style="flex: 1"><span style="font-weight: 600">Monthly</span><span class="muted small">Cancel anytime</span></span><span style="font-weight: 600">$7.99/mo</span></button>
+</div>
+<button class="btn" onClick="{{subscribe}}">{{subscribeBtn}}</button>
+<button class="link" style="min-height: 32px; font-size: 14px" onClick="{{restore}}">Restore purchases</button>
+</div>
+</sc-if>
+
+<!-- Contacts -->
+<sc-if value="{{shContacts}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">One accountability partner</span><span class="muted">They get your Sunday card and a nudge if you go quiet. Nothing else, ever.</span></div>
+<div class="col">
+<sc-for list="{{contacts}}" as="c" hint-placeholder-count="5">
+<button class="contact" aria-pressed="{{c.on}}" onClick="{{c.pick}}">
+<span class="av2">{{c.initial}}</span>
+<span class="col" style="flex: 1"><span style="font-weight: 600">{{c.name}}</span><span class="muted small">{{c.phone}}</span></span>
+<span class="{{c.radioCls}}"><span class="radio"></span></span>
+</button>
+</sc-for>
+</div>
+<button class="btn" disabled="{{contactDis}}" onClick="{{confirmContact}}">{{contactBtn}}</button>
+</div>
+</sc-if>
+
+<!-- Partner -->
+<sc-if value="{{shPartner}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="row" style="gap: 14px">
+<span class="av2" style="width: 52px; height: 52px; border-radius: 26px; font-size: 20px">{{partnerInitial}}</span>
+<span class="col" style="flex: 1"><span class="h2">{{partnerName}}</span><span class="muted small">Your accountability partner</span></span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div class="stat" style="background: #1E1E22"><span class="muted small">Their streak</span><span class="v gold">9</span></div>
+<div class="stat" style="background: #1E1E22"><span class="muted small">Today</span><span class="v">2/3</span></div>
+</div>
+<div class="card row" style="background: #1E1E22; justify-content: space-between">
+<span class="col" style="flex: 1"><span style="font-weight: 600">Nudge {{partnerName}} if I miss 2 days</span><span class="muted small">They'll get one gentle message. That's it.</span></span>
+<button class="{{nudgeSwCls}}" role="switch" aria-checked="{{nudgePartner}}" aria-label="Nudge partner" onClick="{{toggleNudgePartner}}"><span class="knob"></span></button>
+</div>
+<button class="btn" disabled="{{cheerSent}}" onClick="{{sendCheer}}">{{cheerBtn}}</button>
+<button class="link" onClick="{{changePartner}}">Change partner</button>
+</div>
+</sc-if>
+
+<!-- Future Self -->
+<sc-if value="{{shFuture}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 4px"><span class="eyebrow">Future Self</span><span class="muted">{{futureAgeLabel}} has</span><span class="big gold" style="font-size: 44px">{{futureFmt}}</span><span class="muted small">{{futureNote}}</span></div>
+<div style="height: 1px; background: #26262B"></div>
+<sc-if value="{{letterWriting}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<span class="h2">Write to yourself at {{targetAge}}</span>
+<label class="sr" for="letterta">Letter</label>
+<textarea id="letterta" class="ta" style="min-height: 150px; background: #1E1E22" placeholder="Dear me, here's what I'm building right now, and why..." value="{{letterDraft}}" onChange="{{onLetter}}"></textarea>
+<button class="btn" disabled="{{letterDis}}" onClick="{{sealLetter}}">Seal the letter</button>
+</div>
+</sc-if>
+<sc-if value="{{letterSealed}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="card row" style="background: #1E1E22">
+<span class="sicon" style="color: #C9A227"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect><path d="M4 7l8 6 8-6"></path></svg></span>
+<span class="col" style="flex: 1"><span style="font-weight: 600">Letter sealed</span><span class="muted small">{{letterDate}}</span></span>
+</div>
+<sc-if value="{{letterOpen}}" hint-placeholder-val="{{false}}"><div class="card" style="background: #1E1E22; white-space: pre-line; line-height: 1.55">{{letter}}</div></sc-if>
+<button class="btn" onClick="{{toggleLetter}}">{{letterBtn}}</button>
+<button class="link" onClick="{{rewriteLetter}}">Rewrite it</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<!-- Subscription -->
+<sc-if value="{{shSub}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<sc-if value="{{subConfirm}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Cancel your trial?</span><span class="muted">You keep full access until {{trialEndLabel}}. Nothing will be charged.</span></div>
+<button class="btn" onClick="{{confirmCancel}}">Yes, cancel</button>
+<button class="link" onClick="{{keepTrial}}">Keep my trial</button>
+</div>
+</sc-if>
+<sc-if value="{{subMain}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Subscription</span><span class="muted">{{subDetail}}</span></div>
+<sc-if value="{{trialActive}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<div class="card" style="background: #1E1E22; display: flex; flex-direction: column; gap: 10px">
+<div class="row" style="justify-content: space-between"><span class="muted">Days left</span><span class="gold" style="font-weight: 600">{{trialDays}} of 7</span></div>
+<div class="track"><div class="fill" style="width: {{trialPct}}%"></div></div>
+<div class="row" style="justify-content: space-between"><span class="muted">Then</span><span style="font-weight: 600">{{planPriceLabel}}</span></div>
+</div>
+<button class="btn" onClick="{{closeSheet}}">Done</button>
+<button class="link" onClick="{{startCancel}}">Cancel trial</button>
+</div>
+</sc-if>
+<sc-if value="{{trialEnded}}" hint-placeholder-val="{{false}}"><button class="btn" onClick="{{openPaywall}}">Choose a plan</button></sc-if>
+<sc-if value="{{subOther}}" hint-placeholder-val="{{false}}"><button class="btn" onClick="{{closeSheet}}">Done</button></sc-if>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<!-- Help -->
+<sc-if value="{{shHelp}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<span class="h2">Help</span>
+<div class="group" style="background: #1E1E22">
+<sc-for list="{{faqs}}" as="q" hint-placeholder-count="4">
+<button class="srow" style="flex-direction: column; align-items: stretch; gap: 8px; padding: 14px 16px" aria-expanded="{{q.open}}" onClick="{{q.toggle}}">
+<span class="row" style="justify-content: space-between"><span style="font-weight: 600">{{q.q}}</span><span class="muted" style="font-size: 20px; line-height: 1">{{q.sign}}</span></span>
+<sc-if value="{{q.open}}" hint-placeholder-val="{{false}}"><span class="muted" style="line-height: 1.5">{{q.a}}</span></sc-if>
+</button>
+</sc-for>
+</div>
+<button class="btn2" onClick="{{contactSupport}}">Email support</button>
+</div>
+</sc-if>
+
+<!-- Tier 2 review -->
+<sc-if value="{{shReview2}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="eyebrow">Weekly check-in</span><span class="h2">{{r2Name}}: how did this week go?</span></div>
+<div class="stack" style="gap: 8px">
+<sc-for list="{{r2Opts}}" as="o" hint-placeholder-count="3"><button class="{{o.cls}}" onClick="{{o.pick}}"><span class="radio"></span><span class="col"><span style="font-weight: 600">{{o.label}}</span><span class="muted small">{{o.sub}}</span></span></button></sc-for>
+</div>
+<button class="btn" disabled="{{r2Dis}}" onClick="{{saveR2}}">Save check-in</button>
+</div>
+</sc-if>
+
+<!-- Promote -->
+<sc-if value="{{shPromote}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<sc-if value="{{promoteChoose}}" hint-placeholder-val="{{true}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="eyebrow">{{promoteEyebrow}}</span><span class="h2">{{promoteTitle}}</span><span class="muted">{{promoteSub}}</span></div>
+<div class="stack" style="gap: 8px">
+<button class="opt" onClick="{{promoteDaily}}"><span class="col" style="flex: 1"><span style="font-weight: 600">Tier 1 · Daily focus</span><span class="muted small">Gets a daily floor. {{t1Count}}/2 used.</span></span><svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
+<button class="opt" onClick="{{promoteWeekly}}"><span class="col" style="flex: 1"><span style="font-weight: 600">Tier 2 · Weekly check-in</span><span class="muted small">A quick review every Sunday.</span></span><svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg></button>
+<sc-if value="{{promoteIsIdea}}" hint-placeholder-val="{{false}}"><button class="opt" onClick="{{letIdeaGo}}"><span class="col" style="flex: 1"><span style="font-weight: 600">Let it go</span><span class="muted small">The excitement faded. That's the filter working.</span></span><svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg></button></sc-if>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{promoteDemote}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Something has to move down.</span><span class="muted">Daily focus holds two. Pick one to move to weekly so {{promoteName}} can take its place.</span></div>
+<div class="stack shake" style="gap: 8px">
+<sc-for list="{{demoteOpts}}" as="o" hint-placeholder-count="2"><button class="opt" onClick="{{o.pick}}"><span class="col" style="flex: 1"><span style="font-weight: 600">{{o.label}}</span><span class="muted small">Move to weekly check-in</span></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; color: #A6A6AE"><path d="M12 5v14M6 13l6 6 6-6"></path></svg></button></sc-for>
+</div>
+<button class="link" onClick="{{closeSheet}}">Keep things as they are</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<!-- Idea capture -->
+<sc-if value="{{shIdea}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Park it.</span><span class="muted">New ideas wait 14 days. If you're still excited then, it earns a spot. Until then, it doesn't get your time.</span></div>
+<label class="sr" for="ideacap">New idea</label>
+<input id="ideacap" class="input" style="flex: none; background: #1E1E22" placeholder="What's the idea?" value="{{ideaDraft}}" onChange="{{onIdeaDraft}}">
+<button class="btn" disabled="{{ideaDis}}" onClick="{{parkIdea}}">Park for 14 days</button>
+<button class="link" onClick="{{openFocus}}">See idea inbox</button>
+</div>
+</sc-if>
+
+<!-- Routine / anchor edit -->
+<sc-if value="{{shAnchor}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">{{anchorName}}</span><span class="muted">Your nudges move with it.</span></div>
+<div class="row" style="justify-content: center; gap: 16px; padding: 8px 0">
+<button class="stepb" style="width: 52px; height: 52px; border-radius: 26px" aria-label="15 minutes earlier" onClick="{{anchorMinus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"></path></svg></button>
+<span style="font-size: 36px; font-weight: 600; letter-spacing: -0.02em; min-width: 150px; text-align: center">{{anchorTimeFmt}}</span>
+<button class="stepb" style="width: 52px; height: 52px; border-radius: 26px" aria-label="15 minutes later" onClick="{{anchorPlus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></button>
+</div>
+<div class="seg" role="radiogroup" aria-label="Apply to">
+<button class="{{scopeDayCls}}" role="radio" aria-checked="{{scopeDay}}" onClick="{{pickScopeDay}}">{{scopeDayLabel}}</button>
+<button class="{{scopeAllCls}}" role="radio" aria-checked="{{scopeAll}}" onClick="{{pickScopeAll}}">Every day</button>
+</div>
+<button class="btn" onClick="{{saveAnchor}}">Save</button>
+<sc-if value="{{anchorHasOverride}}" hint-placeholder-val="{{false}}"><button class="link" onClick="{{resetAnchor}}">Reset this day to your usual time</button></sc-if>
+</div>
+</sc-if>
+
+<!-- Task add / edit -->
+<sc-if value="{{shTask}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 4px"><span class="h2">{{taskSheetTitle}}</span><span class="muted">{{taskDayLabel}}</span></div>
+<label class="sr" for="taskin">Task</label>
+<input id="taskin" class="input" style="flex: none; background: #1E1E22" placeholder="What needs doing?" value="{{taskTitle}}" onChange="{{onTaskTitle}}">
+<div class="row" style="justify-content: space-between; background: #1E1E22; border-radius: 16px; padding: 8px 8px 8px 16px">
+<span class="muted">Time</span>
+<div class="row" style="gap: 6px">
+<button class="stepb" aria-label="15 minutes earlier" onClick="{{taskMinus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"></path></svg></button>
+<span class="tval">{{taskTimeFmt}}</span>
+<button class="stepb" aria-label="15 minutes later" onClick="{{taskPlus}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></button>
+</div>
+</div>
+<div class="chips">
+<sc-for list="{{taskTimeChips}}" as="c" hint-placeholder-count="4"><button class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+</div>
+<div class="row" style="justify-content: space-between; background: #1E1E22; border-radius: 16px; padding: 12px 12px 12px 16px">
+<span class="col"><span style="font-weight: 600">Nudge me</span><span class="muted small">15 minutes before</span></span>
+<button class="{{taskRemindCls}}" role="switch" aria-checked="{{taskRemind}}" aria-label="Nudge me" onClick="{{toggleTaskRemind}}"><span class="knob"></span></button>
+</div>
+<button class="btn" disabled="{{taskDis}}" onClick="{{saveTask}}">{{taskSaveBtn}}</button>
+<sc-if value="{{taskEditing}}" hint-placeholder-val="{{false}}"><button class="link" onClick="{{deleteTask}}">Delete task</button></sc-if>
+</div>
+</sc-if>
+
+<!-- Lunch check -->
+<sc-if value="{{shLunch}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 4px"><span class="eyebrow">Lunch check · {{nowLabel}}</span><span class="h2">Did you eat?</span></div>
+<div class="seg">
+<button class="{{ateYesCls}}" onClick="{{ateYes}}">Yes</button>
+<button class="{{ateNoCls}}" onClick="{{ateNo}}">Not yet</button>
+</div>
+<sc-if value="{{ateIsYes}}" hint-placeholder-val="{{false}}">
+<div class="card row" style="background: #1E1E22"><span class="col" style="flex: 1"><span class="muted small">Your lunch floor</span><span style="font-weight: 600">{{lunchFloorName}}</span></span><span class="muted small">{{lunchFloorState}}</span></div>
+</sc-if>
+<sc-if value="{{ateIsNo}}" hint-placeholder-val="{{false}}"><p class="muted">No stress. Eat first. We'll check back in 30 minutes.</p></sc-if>
+<button class="btn" disabled="{{lunchDis}}" onClick="{{lunchConfirm}}">{{lunchBtn}}</button>
+</div>
+</sc-if>
+
+<!-- Coming soon -->
+<sc-if value="{{shSoon}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<span class="soon" style="align-self: flex-start">COMING SOON</span>
+<div class="col" style="gap: 8px"><span class="h2">{{soonTitle}}</span><span class="muted" style="line-height: 1.5">{{soonBody}}</span></div>
+<sc-if value="{{soonIsPair}}" hint-placeholder-val="{{true}}">
+<div class="card" style="background: #1E1E22; display: flex; flex-direction: column; gap: 12px">
+<div class="row"><span class="tldot">1</span><span>Every Monday you're matched with one person who also has goals. Similar or different.</span></div>
+<div class="row"><span class="tldot">2</span><span>You see each other's floors and send one check-in a day.</span></div>
+<div class="row"><span class="tldot">3</span><span>Sunday you swap weekly cards, then rotate to someone new.</span></div>
+</div>
+</sc-if>
+<p class="muted small">{{soonMeanwhile}}</p>
+<button class="btn" disabled="{{soonJoined}}" onClick="{{joinSoon}}">{{soonBtn}}</button>
+</div>
+</sc-if>
+
+<!-- Widget -->
+<sc-if value="{{shWidget}}" hint-placeholder-val="{{false}}">
+<div style="display: contents">
+<div class="col" style="gap: 6px"><span class="h2">Home screen widget</span><span class="muted">Your ring, your streak and your next floor, without opening the app.</span></div>
+<div class="row" style="justify-content: center; padding: 8px 0">
+<div class="widget">
+<div class="row" style="justify-content: space-between">
+<div style="position: relative; width: 52px; height: 52px">
+<svg viewBox="0 0 120 120" style="width: 52px; height: 52px; transform: rotate(-90deg)" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="#26262B" stroke-width="16"></circle><circle cx="60" cy="60" r="50" fill="none" stroke="#C9A227" stroke-width="16" stroke-linecap="round" style="stroke-dasharray: 314.16; stroke-dashoffset: {{ringOff}}"></circle></svg>
+</div>
+<div class="row" style="gap: 4px"><svg class="icf" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; color: #C9A227"><path d="M12 2.5c.6 3.2 4.8 5.6 4.8 10.4a4.8 4.8 0 0 1-9.6 0c0-2.2 1-3.7 2.2-4.9.1 1.8.9 3 2 3.4-.4-3.1-.2-5.9.6-8.9z"></path></svg><span class="gold" style="font-weight: 600">{{streak}}</span></div>
+</div>
+<div class="col"><span class="muted small">Next floor</span><span style="font-weight: 600; font-size: 14px; line-height: 1.3">{{widgetNext}}</span></div>
+</div>
+</div>
+<p class="muted small" style="line-height: 1.5">Press and hold your home screen, tap +, search ARENA and pick the small widget.</p>
+<button class="btn" onClick="{{closeSheet}}">Got it</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<!-- NOTIFICATION BANNER (simulated) -->
+<sc-if value="{{hasBanner}}" hint-placeholder-val="{{false}}">
+<div class="banner" role="status">
+<button class="bannerMain" onClick="{{bannerTap}}">
+<span class="appic">A</span>
+<span class="col" style="flex: 1; min-width: 0"><span class="row" style="justify-content: space-between"><span style="font-weight: 600">{{bannerTitle}}</span><span class="muted small">{{bannerTime}}</span></span><span style="font-size: 14px; line-height: 1.35">{{bannerBody}}</span></span>
+</button>
+<button class="iconbtn" aria-label="Dismiss" onClick="{{bannerClose}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; color: #A6A6AE"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+</sc-if>
+
+<!-- TOAST -->
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}"><div class="toast" role="status">{{toast}}</div></sc-if>
+</div></template>
+<script>!function(n){"function"==typeof define&&define.amd?define(n):n()}(function(){var n,t,e,i,r,o,f,u,c,a,s,h,l,p,y,d,v,_="http://www.w3.org/2000/svg",w="http://www.w3.org/1999/xhtml",m=null,g=void 0,b={},k=[],x=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i,C=Array.isArray;function M(n,t){for(var e in t)n[e]=t[e];return n}function S(n){n&&n.parentNode&&n.parentNode.removeChild(n)}function $(t,e,i){var r,o,f,u={};for(f in e)"key"==f?r=e[f]:"ref"==f?o=e[f]:u[f]=e[f];if(arguments.length>2&&(u.children=arguments.length>3?n.call(arguments,2):i),"function"==typeof t&&t.defaultProps!=m)for(f in t.defaultProps)u[f]===g&&(u[f]=t.defaultProps[f]);return A(t,u,r,o,m)}function A(n,i,r,o,f){var u={type:n,props:i,key:r,ref:o,__k:m,__:m,__b:0,__e:m,__c:m,constructor:g,__v:f==m?++e:f,__i:-1,__u:0};return f==m&&t.vnode!=m&&t.vnode(u),u}function I(n){return n.children}function P(n,t){this.props=n,this.context=t}function E(n,t){if(t==m)return n.__?E(n.__,n.__i+1):m;for(var e;t<n.__k.length;t++)if((e=n.__k[t])!=m&&e.__e!=m)return e.__e;return"function"==typeof n.type?E(n):m}function F(n){if(n.__P&&n.__d){var e=n.__v,i=e.__e,r=[],o=[],f=M({},e);f.__v=e.__v+1,t.vnode&&t.vnode(f),B(n.__P,f,e,n.__n,n.__P.namespaceURI,32&e.__u?[i]:m,r,i==m?E(e):i,!!(32&e.__u),o),f.__v=e.__v,f.__.__k[f.__i]=f,G(r,f,o),e.__e=e.__=null,f.__e!=i&&H(f)}}function H(n){if((n=n.__)!=m&&n.__c!=m)return n.__e=n.__c.base=m,n.__k.some(function(t){if(t!=m&&t.__e!=m)return n.__e=n.__c.base=t.__e}),H(n)}function L(n){(!n.__d&&(n.__d=!0)&&r.push(n)&&!T.__r++||o!=t.debounceRendering)&&((o=t.debounceRendering)||f)(T)}function T(){try{for(var n,t=1;r.length;)r.length>t&&r.sort(u),n=r.shift(),t=r.length,F(n)}finally{r.length=T.__r=0}}function j(n,t,e,i,r,o,f,u,c,a,s){var h,l,p,y,d,v,_=i&&i.__k||k,w=t.length;for(c=O(e,t,_,c,w),h=0;h<w;h++)(p=e.__k[h])!=m&&(l=-1!=p.__i&&_[p.__i]||b,p.__i=h,v=B(n,p,l,r,o,f,u,c,a,s),y=p.__e,p.ref&&l.ref!=p.ref&&(l.ref&&Q(l.ref,m,p),s.push(p.ref,p.__c||y,p)),d==m&&y!=m&&(d=y),4&p.__u?(c=V(p,c,n),l.__e&&(l.__e=m)):"function"==typeof p.type&&v!==g?c=v:y&&(c=y.nextSibling),p.__u&=-7);return e.__e=d,c}function O(n,t,e,i,r){var o,f,u,c,a,s=e.length,h=s,l=0;for(n.__k=new Array(r),o=0;o<r;o++)(f=t[o])!=m&&"boolean"!=typeof f&&"function"!=typeof f?("string"==typeof f||"number"==typeof f||"bigint"==typeof f||f.constructor==String?f=n.__k[o]=A(m,f,m,m,m):C(f)?f=n.__k[o]=A(I,{children:f},m,m,m):f.constructor===g&&f.__b>0?f=n.__k[o]=A(f.type,f.props,f.key,f.ref?f.ref:m,f.__v):n.__k[o]=f,c=o+l,f.__=n,f.__b=n.__b+1,a=f.__i=z(f,e,c,h),u=m,-1!=a&&(h--,(u=e[a])&&(u.__u|=2)),u==m||u.__v==m?(-1==a&&(r>s?l--:r<s&&l++),"function"!=typeof f.type&&(f.__u|=4)):a!=c&&(a==c-1?l--:a==c+1?l++:(a>c?l--:l++,f.__u|=4))):n.__k[o]=m;if(h)for(o=0;o<s;o++)(u=e[o])!=m&&0==(2&u.__u)&&(u.__e==i&&(i=E(u)),U(u,u));return i}function V(n,t,e){var i,r;if("function"==typeof n.type){for(i=n.__k,r=0;i&&r<i.length;r++)i[r]&&(i[r].__=n,t=V(i[r],t,e));return t}n.__e!=t&&(t&&n.type&&!t.parentNode&&(t=E(n)),t=e.insertBefore(n.__e,t||m));do{t=t&&t.nextSibling}while(t!=m&&8==t.nodeType);return t}function z(n,t,e,i){var r,o,f,u=n.key,c=n.type,a=t[e],s=a!=m&&0==(2&a.__u);if(a===m&&null==u||s&&u==a.key&&c==a.type)return e;if(i>(s?1:0))for(r=e-1,o=e+1;r>=0||o<t.length;)if((a=t[f=r>=0?r--:o++])!=m&&0==(2&a.__u)&&u==a.key&&c==a.type)return f;return-1}function N(n,t,e){"-"==t[0]?n.setProperty(t,e==m?"":e):n[t]=e==m?"":"number"!=typeof e||x.test(t)?e:e+"px"}function R(n,t,e,i,r){var o,f;n:if("style"==t)if("string"==typeof e)n.style.cssText=e;else{if("string"==typeof i&&(n.style.cssText=i=""),i)for(t in i)e&&t in e||N(n.style,t,"");if(e)for(t in e)i&&e[t]==i[t]||N(n.style,t,e[t])}else if("o"==t[0]&&"n"==t[1])o=t!=(t=t.replace(h,"$1")),f=t.toLowerCase(),t=f in n||"onFocusOut"==t||"onFocusIn"==t?f.slice(2):t.slice(2),n.l||(n.l={}),n.l[t+o]=e,e?i?e[s]=i[s]:(e[s]=l,n.addEventListener(t,o?y:p,o)):n.removeEventListener(t,o?y:p,o);else{if(r==_)t=t.replace(/xlink(H|:h)/,"h").replace(/sName$/,"s");else if("width"!=t&&"height"!=t&&"href"!=t&&"list"!=t&&"form"!=t&&"tabIndex"!=t&&"download"!=t&&"rowSpan"!=t&&"colSpan"!=t&&"role"!=t&&"popover"!=t&&t in n)try{n[t]=e==m?"":e;break n}catch(n){}"function"==typeof e||(e==m||!1===e&&"-"!=t[4]?n.removeAttribute(t):n.setAttribute(t,"popover"==t&&1==e?"":e))}}function q(n){return function(e){if(this.l){var i=this.l[e.type+n];if(e[a]==m)e[a]=l++;else if(e[a]<i[s])return;return i(t.event?t.event(e):e)}}}function B(n,e,i,r,o,f,u,c,a,s){var h,l,p,y,d,v,_,w,b,x,$,A,F,H,L,T,O=e.type;if(e.constructor!==g)return m;128&i.__u&&(a=!!(32&i.__u),f=[c=e.__e=i.__e]),(h=t.__b)&&h(e);n:if("function"==typeof O){l=u.length;try{if(b=e.props,x=O.prototype&&O.prototype.render,$=(h=O.contextType)&&r[h.__c],A=h?$?$.props.value:h.__:r,i.__c?w=(p=e.__c=i.__c).__=p.__E:(x?e.__c=p=new O(b,A):(e.__c=p=new P(b,A),p.constructor=O,p.render=W),$&&$.sub(p),p.state||(p.state={}),p.__n=r,y=p.__d=!0,p.__h=[],p._sb=[]),x&&p.__s==m&&(p.__s=p.state),x&&O.getDerivedStateFromProps!=m&&(p.__s==p.state&&(p.__s=M({},p.__s)),M(p.__s,O.getDerivedStateFromProps(b,p.__s))),d=p.props,v=p.state,p.__v=e,y)x&&O.getDerivedStateFromProps==m&&p.componentWillMount!=m&&p.componentWillMount(),x&&p.componentDidMount!=m&&p.__h.push(p.componentDidMount);else{if(x&&O.getDerivedStateFromProps==m&&b!==d&&p.componentWillReceiveProps!=m&&p.componentWillReceiveProps(b,A),e.__v==i.__v||!p.__e&&p.shouldComponentUpdate!=m&&!1===p.shouldComponentUpdate(b,p.__s,A)){e.__v!=i.__v&&(p.props=b,p.state=p.__s,p.__d=!1),e.__e=i.__e,e.__k=i.__k,e.__k.some(function(n){n&&(n.__=e)}),k.push.apply(p.__h,p._sb),p._sb=[],p.__h.length&&u.push(p),c=E(i);break n}p.componentWillUpdate!=m&&p.componentWillUpdate(b,p.__s,A),x&&p.componentDidUpdate!=m&&p.__h.push(function(){p.componentDidUpdate(d,v,_)})}if(p.context=A,p.props=b,p.__P=n,p.__e=!1,F=t.__r,H=0,x)p.state=p.__s,p.__d=!1,F&&F(e),h=p.render(p.props,p.state,p.context),k.push.apply(p.__h,p._sb),p._sb=[];else do{p.__d=!1,F&&F(e),h=p.render(p.props,p.state,p.context),p.state=p.__s}while(p.__d&&++H<25);p.state=p.__s,p.getChildContext!=m&&(r=M(M({},r),p.getChildContext())),x&&!y&&p.getSnapshotBeforeUpdate!=m&&(_=p.getSnapshotBeforeUpdate(d,v)),L=h!=m&&h.type===I&&h.key==m?J(h.props.children):h,c=j(n,C(L)?L:[L],e,i,r,o,f,u,c,a,s),p.base=e.__e,e.__u&=-161,p.__h.length&&u.push(p),w&&(p.__E=p.__=m)}catch(n){if(u.length=l,e.__v=m,a||f!=m){if(n.then){for(e.__u|=a?160:128;c&&8==c.nodeType&&c.nextSibling;)c=c.nextSibling;f!=m&&(f[f.indexOf(c)]=m),e.__e=c}else if(f!=m)for(T=f.length;T--;)S(f[T])}else e.__e=i.__e;e.__k==m&&(e.__k=i.__k||[]),n.then||D(e),t.__e(n,e,i)}}else f==m&&e.__v==i.__v?(e.__k=i.__k,e.__e=i.__e):c=e.__e=K(i.__e,e,i,r,o,f,u,a,s);return(h=t.diffed)&&h(e),128&e.__u?void 0:c}function D(n){n&&(n.__c&&(n.__c.__e=!0),n.__k&&n.__k.some(D))}function G(n,e,i){for(var r=0;r<i.length;r++)Q(i[r],i[++r],i[++r]);t.__c&&t.__c(e,n),n.some(function(e){try{n=e.__h,e.__h=[],n.some(function(n){n.call(e)})}catch(n){t.__e(n,e.__v)}})}function J(n){return"object"!=typeof n||n==m||n.__b>0?n:C(n)?n.map(J):n.constructor!==g?null:M({},n)}function K(e,i,r,o,f,u,c,a,s){var h,l,p,y,d,v,k,x=r.props||b,M=i.props,$=i.type;if("svg"==$?f=_:"math"==$?f="http://www.w3.org/1998/Math/MathML":f||(f=w),u!=m)for(h=0;h<u.length;h++)if((d=u[h])&&"setAttribute"in d==!!$&&($?d.localName==$:3==d.nodeType)){e=d,u[h]=m;break}if(e==m){if($==m)return document.createTextNode(M);e=document.createElementNS(f,$,M.is&&M),a&&(t.__m&&t.__m(i,u),a=!1),u=m}if($==m)x===M||a&&e.data==M||(e.data=M);else{if(u="textarea"==$&&M.defaultValue!=m?m:u&&n.call(e.childNodes),!a&&u!=m)for(x={},h=0;h<e.attributes.length;h++)x[(d=e.attributes[h]).name]=d.value;for(h in x)d=x[h],"dangerouslySetInnerHTML"==h?p=d:"children"==h||h in M||"value"==h&&"defaultValue"in M||"checked"==h&&"defaultChecked"in M||R(e,h,m,d,f);for(h in M)d=M[h],"children"==h?y=d:"dangerouslySetInnerHTML"==h?l=d:"value"==h?v=d:"checked"==h?k=d:a&&"function"!=typeof d||x[h]===d||R(e,h,d,x[h],f);if(l)a||p&&(l.__html==p.__html||l.__html==e.innerHTML)||(e.innerHTML=l.__html),i.__k=[];else if(p&&(e.innerHTML=""),j("template"==i.type?e.content:e,C(y)?y:[y],i,r,o,"foreignObject"==$?w:f,u,c,u?u[0]:r.__k&&E(r,0),a,s),u!=m)for(h=u.length;h--;)S(u[h]);a&&"textarea"!=$||(h="value","progress"==$&&v==m?e.removeAttribute("value"):v!=g&&(v!==e[h]||"progress"==$&&!v||"option"==$&&v!=x[h])&&R(e,h,v,x[h],f),h="checked",k!=g&&k!=e[h]&&R(e,h,k,x[h],f))}return e}function Q(n,e,i){try{if("function"==typeof n){var r="function"==typeof n.__u;r&&n.__u(),r&&e==m||(n.__u=n(e))}else n.current=e}catch(n){t.__e(n,i)}}function U(n,e,i){var r,o;if(t.unmount&&t.unmount(n),(r=n.ref)&&(r.current&&r.current!=n.__e||Q(r,m,e)),(r=n.__c)!=m){if(r.componentWillUnmount)try{r.componentWillUnmount()}catch(n){t.__e(n,e)}r.base=r.__P=r.__n=m}if(r=n.__k)for(o=0;o<r.length;o++)r[o]&&U(r[o],e,i||"function"!=typeof n.type);i||S(n.__e),n.__c=n.__=n.__e=g}function W(n,t,e){return this.constructor(n,e)}function X(e,i,r){var o,f,u,c;i==document&&(i=document.documentElement),t.__&&t.__(e,i),f=(o="function"==typeof r)?m:r&&r.__k||i.__k,u=[],c=[],B(i,e=(!o&&r||i).__k=$(I,m,[e]),f||b,b,i.namespaceURI,!o&&r?[r]:f?m:i.firstChild?n.call(i.childNodes):m,u,!o&&r?r:f?f.__e:i.firstChild,o,c),G(u,e,c),e.props.children=m}n=k.slice,t={__e:function(n,t,e,i){for(var r,o,f;t=t.__;)if((r=t.__c)&&!r.__)try{if((o=r.constructor)&&o.getDerivedStateFromError!=m&&(r.setState(o.getDerivedStateFromError(n)),f=r.__d),r.componentDidCatch!=m&&(r.componentDidCatch(n,i||{}),f=r.__d),f)return r.__E=r}catch(t){n=t}throw n}},e=0,i=function(n){return n!=m&&n.constructor===g},P.prototype.setState=function(n,t){var e;e=this.__s!=m&&this.__s!=this.state?this.__s:this.__s=M({},this.state),"function"==typeof n&&(n=n(M({},e),this.props)),n&&M(e,n),n!=m&&this.__v&&(t&&this._sb.push(t),L(this))},P.prototype.forceUpdate=function(n){this.__v&&(this.__e=!0,n&&this.__h.push(n),L(this))},P.prototype.render=I,r=[],f="function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout,u=function(n,t){return n.__v.__b-t.__v.__b},T.__r=0,c=Math.random().toString(8),a="__d"+c,s="__a"+c,h=/(PointerCapture)$|Capture$/i,l=0,p=q(!1),y=q(!0),d=0,v={__proto__:null,render:X,hydrate:function n(t,e){X(t,e,n)},createElement:$,h:$,Fragment:I,createRef:function(){return{current:m}},isValidElement:i,Component:P,cloneElement:function(t,e,i){var r,o,f,u,c=M({},t.props);for(f in t.type&&t.type.defaultProps&&(u=t.type.defaultProps),e)"key"==f?r=e[f]:"ref"==f?o=e[f]:c[f]=e[f]===g&&u!=g?u[f]:e[f];return arguments.length>2&&(c.children=arguments.length>3?n.call(arguments,2):i),A(t.type,c,r||t.key,o||t.ref,m)},createContext:function(n){function t(n){var e,i;return this.getChildContext||(e=new Set,(i={})[t.__c]=this,this.getChildContext=function(){return i},this.componentWillUnmount=function(){e=m},this.shouldComponentUpdate=function(n){this.props.value!=n.value&&e.forEach(function(n){n.__e=!0,L(n)})},this.sub=function(n){e.add(n);var t=n.componentWillUnmount;n.componentWillUnmount=function(){e&&e.delete(n),t&&t.call(n)}}),n.children}return t.__c="__cC"+d++,t.__=n,t.Provider=t.__l=(t.Consumer=function(n,t){return n.children(t)}).contextType=t,t},toChildArray:function n(t,e){return e=e||[],t==m||"boolean"==typeof t||(C(t)?t.some(function(t){n(t,e)}):e.push(t)),e},options:t},typeof module<"u"?module.exports=v:self.preact=v});
+
+</script>
+<script>
+(function(){
+var h=preact.h;
+var HOLE=/\{\{\s*([^}]+?)\s*\}\}/g;
+function look(path,sc){
+  path=path.trim();
+  if(path==='true')return true; if(path==='false')return false;
+  if(/^-?\d+(\.\d+)?$/.test(path))return Number(path);
+  var parts=path.split('.'),v=sc;
+  for(var i=0;i<parts.length;i++){ if(v==null)return undefined; v=v[parts[i]]; }
+  return v;
+}
+function interp(str,sc){ return str.replace(HOLE,function(_,p){var v=look(p,sc);return v==null?'':String(v);}); }
+function single(str){ var m=str.match(/^\s*\{\{\s*([^}]+?)\s*\}\}\s*$/); return m?m[1]:null; }
+var ATTR={'class':'class','for':'htmlFor','readonly':'readOnly','tabindex':'tabIndex'};
+function build(node,sc){
+  if(node.nodeType===3){ var t=node.nodeValue; return t.indexOf('{{')<0?t:interp(t,sc); }
+  if(node.nodeType!==1)return null;
+  var tag=node.localName;
+  if(tag==='sc-if'){ return look(single(node.getAttribute('value'))||'false',sc)?kids(node,sc):null; }
+  if(tag==='sc-for'){
+    var list=look(single(node.getAttribute('list')),sc)||[], as=node.getAttribute('as');
+    return list.map(function(it,i){ var s2=Object.create(sc); s2[as]=it; s2.$index=i; return kids(node,s2); });
+  }
+  var props={};
+  for(var i=0;i<node.attributes.length;i++){
+    var a=node.attributes[i], n=a.name, val=a.value;
+    if(n.indexOf('hint-')===0)continue;
+    var one=single(val), v=one!=null?look(one,sc):(val.indexOf('{{')>=0?interp(val,sc):val);
+    if(n.slice(0,2)==='on'){
+      var ev=n.slice(2).toLowerCase();
+      if(ev==='change'&&(tag==='input'||tag==='textarea'))ev='input';
+      if(typeof v==='function')props['on'+ev]=v;
+      continue;
+    }
+    if(n==='disabled'||n==='checked'){ props[n]=!!v&&v!=='false'; continue; }
+    if(n==='value'){ props.value=v==null?'':v; continue; }
+    props[ATTR[n]||n]=(typeof v==='boolean')?String(v):v;
+  }
+  return h(tag,props,kids(node,sc));
+}
+function kids(node,sc){ var out=[]; for(var c=node.firstChild;c;c=c.nextSibling){ var r=build(c,sc); if(r!==null&&r!==undefined)out.push(r);} return out; }
+var tplEl=document.getElementById('arena-template');
+var ROOT=tplEl.content.firstElementChild;
+window.DCLogic=function(){};
+var DCLogic=(function(){
+  function D(props){ preact.Component.call(this,props); this.state={}; }
+  D.prototype=Object.create(preact.Component.prototype); D.prototype.constructor=D;
+  D.prototype.render=function(){ return build(ROOT,this.renderVals()); };
+  return D;
+})();
+window.__DC=DCLogic;
+})();
+</script>
+<script>
+var DCLogic = window.__DC;
+
+const IDS = ["Builder", "Saver", "Athlete", "Fighter", "Creator", "Learner"];
+const GOAL_EX = ["Side business", "Gym", "Save money", "Learn guitar", "Read more", "Content"];
+const GOAL_ID = { "Side business": "Builder", "Gym": "Athlete", "Save money": "Saver", "Learn guitar": "Creator", "Read more": "Learner", "Content": "Creator" };
+const DEF_FLOOR = {
+  "Side business": ["wake", "I open my laptop", "Ship one small task"],
+  "Gym": ["out", "I clock out", "30 min gym"],
+  "Save money": ["lunch", "I finish lunch", "Log what I spent"],
+  "Learn guitar": ["home", "I get home", "Play for 10 minutes"],
+  "Read more": ["checkin", "I close the day", "Read 5 pages"],
+  "Content": ["wake", "I finish my coffee", "Post one thing"]
+};
+const SHRINK = {
+  "30 min gym": "10 min walk", "45 min gym": "15 min walk",
+  "Ship one small task": "Open the doc for 5 min",
+  "Log what I spent": "Log one expense",
+  "Write tomorrow's top task": "Write one line",
+  "Read 5 pages": "Read 1 page",
+  "Play for 10 minutes": "Play for 2 minutes",
+  "Post one thing": "Draft one line"
+};
+const RAISE = { "30 min gym": "45 min gym", "Read 5 pages": "Read 10 pages", "Ship one small task": "Ship two small tasks", "Log what I spent": "Log and review spends" };
+const ANCHORS = [["wake", "Wake up", "Morning brief 30 min after"], ["lunch", "Lunch", "Did-you-eat check 30 min after"], ["out", "Clock out", "Your after-work floor"], ["home", "Home", "Time to land"], ["checkin", "Close the day", "Evening check-in"]];
+const WHEN_ANCHOR = { "I wake up": "wake", "I open my laptop": "wake", "I finish my coffee": "wake", "I finish lunch": "lunch", "I clock out": "out", "I get home": "home", "I close the day": "checkin", "I get into bed": "checkin" };
+const WHEN_SUG = ["I wake up", "I finish lunch", "I clock out", "I get home"];
+const THEN_SUG = ["log what I spent", "ship one small task", "do 10 push-ups", "read 5 pages"];
+const CONTACTS = [["Riya", "+1 (415) 555-0142"], ["Kabir", "+1 (646) 555-0187"], ["Meera", "+1 (312) 555-0119"], ["Dev", "+1 (206) 555-0163"], ["Sana", "+1 (512) 555-0175"]];
+const SKIPS = [["Takeout", 18], ["Coffee", 6], ["Impulse buy", 25], ["Ride", 12]];
+
+class Component extends DCLogic {
+  money(n) { return "$" + Math.round(n).toLocaleString("en-US"); }
+  bigMoney(n) {
+    if (n >= 1e6) return "$" + (n / 1e6).toFixed(2) + "M";
+    if (n >= 1e4) return "$" + (n / 1e3).toFixed(1) + "k";
+    return this.money(n);
+  }
+  fmt(t) {
+    t = ((t % 1440) + 1440) % 1440;
+    let h = Math.floor(t / 60); const m = t % 60;
+    const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+    return h + ":" + (m < 10 ? "0" : "") + m + " " + ap;
+  }
+  cap(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
+  lc(t) { return t ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  targetAge(age) { return age < 35 ? 35 : age + 10; }
+  future(monthly, total, age) {
+    const n = (this.targetAge(age) - age) * 12;
+    const g = Math.pow(1.01, n);
+    return monthly * ((g - 1) / 0.01) + total * g;
+  }
+  dateFor(d) { const x = new Date(); x.setDate(x.getDate() + d); return x; }
+  dayLabel(d, long) { return this.dateFor(d).toLocaleDateString("en-US", long ? { weekday: "long", month: "long", day: "numeric" } : { weekday: "short", month: "short", day: "numeric" }); }
+  idFor(goal, ids) {
+    const list = ids && ids.length ? ids : ["Builder"];
+    if (goal === "_core") return list.includes("Saver") ? "Saver" : list[0];
+    return list.includes(GOAL_ID[goal]) ? GOAL_ID[goal] : list[0];
+  }
+
+  base() {
+    return {
+      ready: true, screen: "ob", ob: 0, tab: "today",
+      identities: [], goals: [], customs: [], customGoal: "", tiers: {}, pick: null,
+      shake: "", obMsg: "", t1Msg: false,
+      anchors: { wake: 420, lunch: 810, out: 1080, home: 1140, checkin: 1185 },
+      whenVal: "I finish lunch", thenVal: "log what I spent", activeField: "when",
+      age: 26, saveAmt: 250, notif: false, plan: "annual",
+      floors: [], streak: 0, best: 0, shields: 1, missed: 0, shieldUsed: false,
+      skipToday: 0, savedMonth: 0, savingsHist: [], transferDone: false,
+      trial: "active", trialDays: 7, cancelled: false, sunday: false,
+      sheet: null, padVal: "", padLabel: "", toast: "", toastId: 0, flameAnim: false, celebrated: false,
+      isNew: true, partner: null, contactPick: null, contactMode: "set", nudgePartner: true, cheerSent: false,
+      letter: "", letterDraft: "", letterOpen: false, letterWriting: true, letterDate: "",
+      rewardFloor: null, rewardDraft: "", proofFloor: null, proofDraft: "", proofPhoto: false,
+      reviewStep: 0, review: ["", "", ""], r2Goal: null, r2Pick: null, reviewed: {},
+      promoteGoal: null, promoteIdea: null, demoteMode: false, faqOpen: -1,
+      reason: null, shrink: false, subConfirm: false, memberSince: "Nov 2026", gradName: "", automatic: [],
+      ideas: [], ideaDraft: "",
+      now: 680, banner: null, bannerId: 0,
+      tasks: [], overrides: {}, planDay: 0,
+      anchorEdit: null, anchorTime: 0, anchorScope: "day",
+      taskEdit: null, taskTitle: "", taskTime: 600, taskRemind: true,
+      closeStep: 0, closeNote: "", dayClosed: false, tmDraft: "", tmTime: 540,
+      coachDone: null, reasons: [], soon: null, waitPair: false, waitStakes: false, ate: null,
+      votesBase: {}, weekVotesBase: 0
+    };
+  }
+  sampleFloors() {
+    return [
+      { id: "f1", goal: "Side business", anchor: "wake", when: "I open my laptop", action: "Ship one small task", forge: 21, done: true, reward: "", seed: 3, lighter: false, proof: "Pushed the pricing page fix", health: false, viaHealth: false },
+      { id: "f2", goal: "Gym", anchor: "out", when: "I clock out", action: "30 min gym", forge: 54, done: false, reward: "Next episode", seed: 7, lighter: false, proof: "", health: true, viaHealth: false },
+      { id: "f3", goal: "_core", anchor: "lunch", when: "I finish lunch", action: "Log what I spent", forge: 40, done: true, reward: "", seed: 11, lighter: false, proof: "", health: false, viaHealth: false },
+      { id: "f4", goal: "Side business", anchor: "checkin", when: "I close the day", action: "Write tomorrow's top task", forge: 8, done: false, reward: "", seed: 17, lighter: false, proof: "", health: false, viaHealth: false }
+    ];
+  }
+  sample(over) {
+    return Object.assign(this.base(), {
+      screen: "app", tab: "today", ob: 8,
+      identities: ["Builder", "Saver"],
+      goals: ["Side business", "Gym", "Content", "Learn guitar", "Read more"],
+      tiers: { "Side business": 1, "Gym": 1, "Content": 2, "Learn guitar": 3, "Read more": 3 },
+      floors: this.sampleFloors(), streak: 12, best: 21, shields: 1,
+      skipToday: 24, savedMonth: 186, savingsHist: [250, 520, 800, 1060, 1340],
+      trialDays: 4, isNew: false, memberSince: "Sep 2026", notif: true, plan: "annual",
+      tasks: [
+        { id: "t1", day: 0, t: 600, title: "Call with the designer", done: true, remind: true },
+        { id: "t2", day: 0, t: 960, title: "Send the invoice", done: false, remind: true },
+        { id: "t3", day: 1, t: 660, title: "Dentist", done: false, remind: true }
+      ],
+      ideas: [{ id: "i1", name: "Podcast", ago: 3 }, { id: "i2", name: "Resell sneakers", ago: 14 }],
+      reasons: ["Low energy", "No time", "Low energy", "Low energy"],
+      votesBase: { Builder: 186, Saver: 64 }, weekVotesBase: 17, partner: "Riya"
+    }, over || {});
+  }
+  undone() { return this.sampleFloors().map((f) => Object.assign({}, f, { done: false })); }
+  stateFor(k) {
+    switch (k) {
+      case "paywall": return Object.assign(this.base(), { ob: 8, identities: ["Builder", "Saver"], goals: ["Side business", "Gym", "Content", "Learn guitar", "Read more"], tiers: { "Side business": 1, "Gym": 1, "Content": 2, "Learn guitar": 3, "Read more": 3 } });
+      case "today": case "trialActive": return this.sample();
+      case "plan": return this.sample({ tab: "plan" });
+      case "progress": return this.sample({ tab: "progress" });
+      case "you": return this.sample({ tab: "you" });
+      case "focus": return this.sample({ screen: "focus", tab: "you" });
+      case "close": return this.sample({ screen: "close", now: 1185 });
+      case "trialEnded": return this.sample({ trial: "ended", trialDays: 0 });
+      case "comeback": return this.sample({ screen: "comeback", missed: 1, floors: this.undone(), skipToday: 0 });
+      case "fresh": return this.sample({ screen: "fresh", missed: 3, shields: 0, floors: this.undone(), skipToday: 0 });
+      case "review": return this.sample({ screen: "review", sunday: true });
+      case "graduate": {
+        const fl = this.sampleFloors().map((f) => f.id === "f2" ? Object.assign({}, f, { forge: 66 }) : f);
+        return this.sample({ screen: "graduate", floors: fl, gradName: "30 min gym", gradId: "f2" });
+      }
+      default: return this.base();
+    }
+  }
+  getS() {
+    if (this.state && this.state.ready) return this.state;
+    if (!this._init) this._init = this.stateFor(this.props.start || "onboarding");
+    return this._init;
+  }
+  componentDidMount() { this.setState(this.getS()); }
+  componentDidUpdate(prev) {
+    if (prev && prev.start !== this.props.start) this.setState(this.stateFor(this.props.start || "onboarding"));
+  }
+  componentWillUnmount() { (this._t || []).forEach((t) => clearTimeout(t)); }
+  later(fn, ms) { this._t = this._t || []; this._t.push(setTimeout(fn, ms)); }
+  toast(msg) {
+    const id = (this.getS().toastId || 0) + 1;
+    this.setState({ toast: msg, toastId: id });
+    this.later(() => { if (this.getS().toastId === id) this.setState({ toast: "" }); }, 2400);
+  }
+  banner(b) {
+    const id = (this.getS().bannerId || 0) + 1;
+    this.setState({ banner: b, bannerId: id });
+    this.later(() => { if (this.getS().bannerId === id) this.setState({ banner: null }); }, 8000);
+  }
+  shakeIt(key, msg) {
+    this.setState({ shake: key, obMsg: msg || "" });
+    this.later(() => this.setState({ shake: "" }), 480);
+  }
+  demo(k, msg) {
+    this._init = null;
+    this.setState(this.stateFor(k));
+    if (msg) this.later(() => this.toast(msg), 350);
+  }
+  visible(floors, tiers) { return floors.filter((f) => f.goal === "_core" || tiers[f.goal] === 1); }
+  eff(s, d) { return Object.assign({}, s.anchors, s.overrides[d] || {}); }
+  nudgesFor(s, d) {
+    const A = this.eff(s, d);
+    const vis = this.visible(s.floors, s.tiers);
+    const by = (a) => vis.filter((f) => f.anchor === a).map((f) => f.action);
+    const out = [];
+    const first = by("wake")[0] || (vis[0] ? vis[0].action : "your first floor");
+    out.push({ t: A.wake + 30, title: "Morning brief", body: vis.length + " floors today. First up: " + this.lc(first) + "." });
+    if (by("wake").length) out.push({ t: A.lunch - 60, title: "Before lunch", body: by("wake").join(", ") + ". Still time." });
+    const lf = by("lunch");
+    out.push({ t: A.lunch + 30, title: "Lunch check", body: "Did you eat?" + (lf.length ? " Then " + this.lc(lf[0]) + "." : "") });
+    if (by("out").length) out.push({ t: A.out, title: "Clock-out floor", body: by("out").join(", ") + ". Even 10 minutes counts." });
+    if (by("home").length) out.push({ t: A.home + 15, title: "You're home", body: by("home").join(", ") + "." });
+    out.push({ t: A.checkin, title: "Close the day", body: "2 minutes. How it went, then plan tomorrow." });
+    s.tasks.filter((t) => t.day === d && t.remind && !t.done).forEach((t) => out.push({ t: t.t - 15, title: "Coming up", body: t.title + " at " + this.fmt(t.t) + "." }));
+    return out.sort((a, b) => a.t - b.t);
+  }
+  hist(f, s) {
+    const out = [];
+    let x = f.seed * 7919 + 13;
+    const r = () => { x = (x * 9301 + 49297) % 233280; return x / 233280; };
+    for (let i = 0; i < 84; i++) {
+      const ago = 83 - i;
+      let v;
+      if (ago >= Math.min(f.forge, 84)) v = "n";
+      else if (ago === 0) v = f.done ? "d" : "t";
+      else if (s.missed > 0 && ago <= s.missed) v = (s.missed === 1 && s.shieldUsed) ? "s" : "m";
+      else if (ago <= s.streak + s.missed) v = "d";
+      else v = r() < 0.8 ? "d" : "m";
+      if (!s.isNew && ago === 9 + s.missed && f.forge > 9 + s.missed && s.streak >= 9) v = "s";
+      out.push(v);
+    }
+    return out;
+  }
+
+  // ---------- actions ----------
+  obNext() {
+    const s = this.getS();
+    const n = s.ob + 1;
+    const p = { ob: n, obMsg: "", t1Msg: false };
+    if (n === 3) {
+      const t = {};
+      s.goals.forEach((g) => { if (s.tiers[g]) t[g] = s.tiers[g]; });
+      p.tiers = t;
+      p.pick = s.goals.find((g) => !t[g]) || null;
+    }
+    this.setState(p);
+  }
+  toggleId(name) {
+    const s = this.getS();
+    if (s.identities.includes(name)) return this.setState({ identities: s.identities.filter((i) => i !== name), obMsg: "" });
+    if (s.identities.length >= 2) return this.shakeIt("id", "Two is plenty. Tap one to swap it out.");
+    this.setState({ identities: s.identities.concat([name]), obMsg: "" });
+  }
+  toggleGoal(name) {
+    const s = this.getS();
+    if (s.goals.includes(name)) return this.setState({ goals: s.goals.filter((g) => g !== name), obMsg: "" });
+    if (s.goals.length >= 6) return this.shakeIt("goal", "Six is the cap. If it's not on this list, it can wait.");
+    this.setState({ goals: s.goals.concat([name]), obMsg: "" });
+  }
+  addCustom() {
+    const s = this.getS();
+    const g = (s.customGoal || "").trim();
+    if (!g) return;
+    if (s.goals.includes(g)) return this.setState({ customGoal: "" });
+    if (s.goals.length >= 6) return this.shakeIt("goal", "Six is the cap. If it's not on this list, it can wait.");
+    const customs = GOAL_EX.includes(g) || s.customs.includes(g) ? s.customs : s.customs.concat([g]);
+    this.setState({ goals: s.goals.concat([g]), customs: customs, customGoal: "", obMsg: "" });
+  }
+  dropTier(tier) {
+    const s = this.getS();
+    if (!s.pick) return;
+    const t1 = s.goals.filter((g) => s.tiers[g] === 1 && g !== s.pick).length;
+    if (tier === 1 && t1 >= 2) { this.setState({ t1Msg: true }); this.shakeIt("t1"); return; }
+    const tiers = Object.assign({}, s.tiers);
+    tiers[s.pick] = tier;
+    const next = s.goals.find((g) => !tiers[g]) || null;
+    this.setState({ tiers: tiers, pick: next, t1Msg: false });
+  }
+  stepAnchor(id, delta) {
+    const s = this.getS();
+    const a = Object.assign({}, s.anchors);
+    a[id] = Math.max(0, Math.min(1425, a[id] + delta));
+    this.setState({ anchors: a });
+  }
+  keyPress(field, k) {
+    const s = this.getS();
+    let str = field === "ob" ? String(s.saveAmt || "") : s.padVal;
+    if (str === "0") str = "";
+    if (k === "del") str = str.slice(0, -1);
+    else str = (str + k).replace(/^0+/, "");
+    let n = parseInt(str || "0", 10);
+    const max = field === "ob" ? 20000 : 100000;
+    if (n > max) n = max;
+    if (field === "ob") this.setState({ saveAmt: n });
+    else this.setState({ padVal: n ? String(n) : "", padLabel: "" });
+  }
+  finishOb() {
+    const s = this.getS();
+    const ids = s.identities.length ? s.identities : ["Builder"];
+    const coreAnchor = WHEN_ANCHOR[s.whenVal] || "lunch";
+    const floors = [{ id: "c0", goal: "_core", anchor: coreAnchor, when: s.whenVal, action: this.cap(s.thenVal), forge: 1, done: false, reward: "", seed: 11, lighter: false, proof: "", health: false, viaHealth: false }];
+    let i = 0;
+    s.goals.filter((g) => s.tiers[g] === 1).forEach((g) => {
+      const d = DEF_FLOOR[g] || ["wake", "I start my day", "10 minutes on " + g.toLowerCase()];
+      i++;
+      floors.push({ id: "g" + i, goal: g, anchor: d[0], when: d[1], action: d[2], forge: 1, done: false, reward: "", seed: 20 + i, lighter: false, proof: "", health: g === "Gym", viaHealth: false });
+    });
+    const vb = {}; ids.forEach((x) => { vb[x] = 0; });
+    this.setState({ screen: "app", tab: "today", floors: floors, streak: 0, best: 0, shields: 1, missed: 0, skipToday: 0, savedMonth: 0, savingsHist: [], trial: "active", trialDays: 7, isNew: true, celebrated: false, memberSince: "Nov 2026", now: s.anchors.wake + 60, tasks: [], ideas: [], reasons: [], votesBase: vb, weekVotesBase: 0 });
+  }
+  toggleFloor(id, viaHealth) {
+    const s = this.getS();
+    const floors = s.floors.map((f) => f.id === id ? Object.assign({}, f, { done: viaHealth ? true : !f.done, viaHealth: !!viaHealth }) : f);
+    const vis = this.visible(floors, s.tiers);
+    const all = vis.length > 0 && vis.every((f) => f.done);
+    this.setState({ floors: floors });
+    if (all && !s.celebrated) {
+      this.later(() => {
+        const c = this.getS();
+        const st = c.streak + 1;
+        if (c.screen !== "app") { this.setState({ celebrated: true, streak: st, best: Math.max(c.best, st) }); return; }
+        this.setState({ screen: "celebrate", celebrated: true, streak: st, best: Math.max(c.best, st) });
+      }, 700);
+    }
+  }
+  celebrateDone() {
+    this.setState({ screen: "app", tab: "today", flameAnim: true });
+    this.later(() => this.setState({ flameAnim: false }), 1300);
+  }
+  isPro(s) { return s.trial === "active" || s.trial === "pro"; }
+  openReward(id) {
+    const s = this.getS();
+    if (!this.isPro(s)) return this.setState({ sheet: "paywall" });
+    const f = s.floors.find((x) => x.id === id);
+    this.setState({ sheet: "reward", rewardFloor: id, rewardDraft: f ? f.reward : "" });
+  }
+  setFloor(id, patch) {
+    const s = this.getS();
+    this.setState({ floors: s.floors.map((f) => f.id === id ? Object.assign({}, f, patch) : f) });
+  }
+  confirmSkip() {
+    const s = this.getS();
+    const n = parseInt(s.padVal || "0", 10);
+    if (!n) return;
+    this.setState({ skipToday: s.skipToday + n, savedMonth: s.savedMonth + n, sheet: null, padVal: "", padLabel: "" });
+    this.toast(this.money(n) + " to future you. " + this.money(s.savedMonth + n) + " this month.");
+  }
+  imBack() {
+    const s = this.getS();
+    const used = s.shields > 0;
+    let floors = s.floors;
+    if (s.shrink) {
+      const vis = this.visible(s.floors, s.tiers);
+      const target = vis.find((f) => f.action === "30 min gym") || vis.find((f) => SHRINK[f.action]);
+      if (target) floors = s.floors.map((f) => f.id === target.id ? Object.assign({}, f, { action: SHRINK[f.action], lighter: true }) : f);
+    }
+    const reasons = s.reason ? s.reasons.concat([s.reason]) : s.reasons;
+    this.setState({ screen: "app", tab: "today", floors: floors, reasons: reasons, shields: used ? s.shields - 1 : 0, shieldUsed: used, streak: used ? s.streak : 0, celebrated: false });
+    this.later(() => this.toast(used ? "Back in. Streak protected." : "Back in. Day 1 again, and that's fine."), 300);
+  }
+  restart() {
+    const s = this.getS();
+    this.setState({ screen: "app", tab: "today", streak: 0, shields: 1, celebrated: false, floors: s.floors.map((f) => Object.assign({}, f, { done: false })) });
+    this.later(() => this.toast("Day 1. Clean slate."), 300);
+  }
+  promoteTo(tier) {
+    const s = this.getS();
+    const g = s.promoteGoal;
+    if (!g) return;
+    if (tier === 1) {
+      const t1 = s.goals.filter((x) => s.tiers[x] === 1);
+      if (t1.length >= 2) return this.setState({ demoteMode: true });
+    }
+    this.applyPromote(g, tier, null);
+  }
+  applyPromote(g, tier, demote) {
+    const s = this.getS();
+    const tiers = Object.assign({}, s.tiers);
+    tiers[g] = tier;
+    if (demote) tiers[demote] = 2;
+    const goals = s.goals.includes(g) ? s.goals : s.goals.concat([g]);
+    const ideas = s.promoteIdea ? s.ideas.filter((i) => i.id !== s.promoteIdea) : s.ideas;
+    let floors = s.floors;
+    if (tier === 1 && !floors.some((f) => f.goal === g)) {
+      const d = DEF_FLOOR[g] || ["wake", "I start my day", "10 minutes on " + g.toLowerCase()];
+      floors = floors.concat([{ id: "p" + Date.now(), goal: g, anchor: d[0], when: d[1], action: d[2], forge: 1, done: false, reward: "", seed: 31, lighter: false, proof: "", health: false, viaHealth: false }]);
+    }
+    this.setState({ tiers: tiers, goals: goals, ideas: ideas, floors: floors, sheet: null, demoteMode: false, promoteGoal: null, promoteIdea: null });
+    this.toast(demote ? g + " is in. " + demote + " moved to weekly." : g + " moved to " + (tier === 1 ? "daily focus." : "weekly check-in."));
+  }
+  parkIdea() {
+    const s = this.getS();
+    const name = (s.ideaDraft || "").trim();
+    if (!name) return;
+    this.setState({ ideas: s.ideas.concat([{ id: "i" + Date.now(), name: name, ago: 0 }]), ideaDraft: "", sheet: null });
+    this.toast("Parked. Look again on " + this.dayLabel(14).replace(/^\w+, /, "") + ".");
+  }
+  saveAnchor() {
+    const s = this.getS();
+    const id = s.anchorEdit;
+    if (s.anchorScope === "all") {
+      const a = Object.assign({}, s.anchors); a[id] = s.anchorTime;
+      const ov = {};
+      Object.keys(s.overrides).forEach((d) => { const o = Object.assign({}, s.overrides[d]); delete o[id]; ov[d] = o; });
+      this.setState({ anchors: a, overrides: ov, sheet: null });
+      this.toast("Every day updated. Nudges moved too.");
+    } else {
+      const ov = Object.assign({}, s.overrides);
+      ov[s.planDay] = Object.assign({}, ov[s.planDay] || {});
+      ov[s.planDay][id] = s.anchorTime;
+      this.setState({ overrides: ov, sheet: null });
+      this.toast("Changed for " + this.dayLabel(s.planDay) + " only.");
+    }
+  }
+  saveTask() {
+    const s = this.getS();
+    const title = (s.taskTitle || "").trim();
+    if (!title) return;
+    if (s.taskEdit) {
+      this.setState({ tasks: s.tasks.map((t) => t.id === s.taskEdit ? Object.assign({}, t, { title: title, t: s.taskTime, remind: s.taskRemind }) : t), sheet: null });
+      this.toast("Task updated.");
+    } else {
+      this.setState({ tasks: s.tasks.concat([{ id: "t" + Date.now(), day: s.planDay, t: s.taskTime, title: title, done: false, remind: s.taskRemind }]), sheet: null });
+      this.toast("Added to " + this.dayLabel(s.planDay) + (s.taskRemind ? ". Nudge 15 min before." : "."));
+    }
+  }
+  toggleTask(id) {
+    const s = this.getS();
+    this.setState({ tasks: s.tasks.map((t) => t.id === id ? Object.assign({}, t, { done: !t.done }) : t) });
+  }
+  sendNudge(kind) {
+    const s0 = this.getS();
+    if (s0.screen !== "app") this.setState({ screen: "app" });
+    const s = this.getS();
+    const A = this.eff(s, 0);
+    const vis = this.visible(s.floors, s.tiers);
+    if (kind === "morning") {
+      this.setState({ now: A.wake + 30, sheet: null });
+      const n = this.nudgesFor(s, 0)[0];
+      this.banner({ title: "Morning brief", body: n.body, time: this.fmt(A.wake + 30), action: "today" });
+    } else if (kind === "lunch") {
+      this.setState({ now: A.lunch + 30, sheet: null });
+      const lf = vis.find((f) => f.anchor === "lunch");
+      this.banner({ title: "Lunch check", body: "Did you eat?" + (lf ? " Then " + this.lc(lf.action) + ". 10 seconds." : ""), time: this.fmt(A.lunch + 30), action: "lunch" });
+    } else if (kind === "evening") {
+      this.setState({ now: A.checkin, sheet: null });
+      this.banner({ title: "Close the day", body: "2 minutes. Tell me how today went and plan tomorrow.", time: this.fmt(A.checkin), action: "close" });
+    } else if (kind === "health") {
+      const g = vis.find((f) => f.health);
+      this.setState({ now: A.out + 50, sheet: null });
+      if (g) this.toggleFloor(g.id, true);
+      this.banner({ title: "Apple Health", body: g ? "34 min strength workout logged. " + g.action + " cleared for you." : "Workout logged.", time: this.fmt(A.out + 50), action: "today" });
+    } else if (kind === "cheer") {
+      const p = s.partner || "Riya";
+      this.setState({ partner: p });
+      this.banner({ title: p + " sent you a cheer", body: "Day " + s.streak + ". Don't you dare stop now.", time: "now", action: "partner" });
+    } else if (kind === "idea") {
+      let ideas = s.ideas.length ? s.ideas : [{ id: "i1", name: "Podcast", ago: 3 }];
+      ideas = ideas.map((i, k) => k === 0 ? Object.assign({}, i, { ago: 14 }) : i);
+      this.setState({ ideas: ideas });
+      this.banner({ title: "An idea is ready", body: ideas[0].name + " cooled off for 14 days. Still excited?", time: "now", action: "idea", ideaId: ideas[0].id });
+    }
+  }
+  bannerTap() {
+    const s = this.getS();
+    const b = s.banner;
+    if (!b) return;
+    this.setState({ banner: null });
+    if (b.action === "lunch") this.setState({ screen: "app", tab: "today", sheet: "lunch", ate: null });
+    else if (b.action === "close") this.setState({ screen: "close", closeStep: 0, sheet: null });
+    else if (b.action === "partner") this.setState({ screen: "app", tab: "you", sheet: "partner", cheerSent: false });
+    else if (b.action === "idea") {
+      const idea = s.ideas.find((i) => i.id === b.ideaId) || s.ideas[0];
+      this.setState({ screen: "focus", sheet: "promote", promoteGoal: idea ? idea.name : null, promoteIdea: idea ? idea.id : null, demoteMode: false });
+    } else this.setState({ screen: "app", tab: "today", sheet: null });
+  }
+
+  renderVals() {
+    const s = this.getS();
+    const v = {};
+    const set = (p) => () => this.setState(p);
+    const pro = this.isPro(s);
+    const ids = s.identities.length ? s.identities : ["Builder"];
+
+    // screens
+    v.isOb = s.screen === "ob"; v.isSuccess = s.screen === "success";
+    v.isApp = s.screen !== "ob" && s.screen !== "success";
+    v.isCelebrate = s.screen === "celebrate"; v.isComeback = s.screen === "comeback"; v.isFresh = s.screen === "fresh";
+    v.isReview = s.screen === "review"; v.isGraduate = s.screen === "graduate"; v.isFocus = s.screen === "focus"; v.isClose = s.screen === "close";
+    v.backToApp = () => this.setState({ screen: "app", tab: "today", sheet: null });
+    v.hasToast = !!s.toast; v.toast = s.toast;
+    v.hasBanner = !!s.banner;
+    v.bannerTitle = s.banner ? s.banner.title : ""; v.bannerBody = s.banner ? s.banner.body : ""; v.bannerTime = s.banner ? s.banner.time : "";
+    v.bannerTap = () => this.bannerTap();
+    v.bannerClose = set({ banner: null });
+
+    // ---------- onboarding ----------
+    for (let i = 0; i < 9; i++) v["ob" + i] = s.ob === i;
+    v.obShowTop = s.ob > 0;
+    v.obPct = Math.round((s.ob / 8) * 100);
+    v.obStepLabel = s.ob < 8 ? s.ob + "/7" : "";
+    v.obBack = () => this.setState({ ob: Math.max(0, s.ob - 1), obMsg: "", t1Msg: false });
+    v.obNext = () => this.obNext();
+    v.loginDemo = () => this.demo("today", "Welcome back, Abbu.");
+    v.obMsgOn = !!s.obMsg; v.obMsg = s.obMsg;
+    const unsortedN = s.goals.filter((g) => !s.tiers[g]).length;
+    const t1N = s.goals.filter((g) => s.tiers[g] === 1).length;
+    v.obDis = s.ob === 1 ? s.identities.length === 0 : s.ob === 2 ? s.goals.length === 0 : s.ob === 3 ? (unsortedN > 0 || t1N === 0) : s.ob === 5 ? (!(s.whenVal || "").trim() || !(s.thenVal || "").trim()) : s.ob === 6 ? !s.saveAmt : false;
+    v.idShake = s.shake === "id" ? "shake" : "";
+    v.goalShake = s.shake === "goal" ? "shake" : "";
+    v.idChips = IDS.map((n) => { const on = s.identities.includes(n); return { label: n, on: on, cls: "chip" + (on ? " on" : ""), toggle: () => this.toggleId(n) }; });
+    v.goalChips = GOAL_EX.concat(s.customs).map((n) => { const on = s.goals.includes(n); return { label: n, on: on, cls: "chip" + (on ? " on" : ""), toggle: () => this.toggleGoal(n) }; });
+    v.customGoal = s.customGoal;
+    v.onCustom = (e) => this.setState({ customGoal: e.target.value });
+    v.addCustom = () => this.addCustom();
+    v.goalCountLabel = s.goals.length + " of 6 added";
+
+    const unsorted = s.goals.filter((g) => !s.tiers[g]);
+    v.hasUnsorted = unsorted.length > 0;
+    const chipFor = (g) => ({ label: g, cls: "chip" + (s.pick === g ? " on" : ""), pick: () => this.setState({ pick: s.pick === g ? null : g, t1Msg: false }) });
+    v.unsortedChips = unsorted.map(chipFor);
+    const tierMeta = [[1, "Tier 1 · Daily focus", "Max 2. These get a daily floor."], [2, "Tier 2 · Weekly check-in", "Reviewed every Sunday."], [3, "Tier 3 · Parked", "Not now. Not never."]];
+    v.tierBoxes = tierMeta.map((m) => {
+      const items = s.goals.filter((g) => s.tiers[g] === m[0]);
+      const canDrop = !!s.pick && s.tiers[s.pick] !== m[0];
+      let cls = "tier" + (canDrop ? " ready" : "");
+      if (m[0] === 1 && s.shake === "t1") cls += " shake";
+      return { title: m[1] + (m[0] === 1 ? "  " + items.length + "/2" : ""), sub: m[2], items: items.map(chipFor), empty: items.length === 0, canDrop: canDrop, drop: () => this.dropTier(m[0]), cls: cls, msgOn: m[0] === 1 && s.t1Msg };
+    });
+
+    // routine
+    v.routineRows = ANCHORS.map((a) => ({
+      label: a[1], sub: a[2], time: this.fmt(s.anchors[a[0]]),
+      minus: () => this.stepAnchor(a[0], -15), plus: () => this.stepAnchor(a[0], 15),
+      minusAria: a[1] + " 15 minutes earlier", plusAria: a[1] + " 15 minutes later"
+    }));
+
+    // floor builder
+    v.whenText = s.whenVal || "...";
+    v.thenText = s.thenVal || "...";
+    v.whenCls = "field" + (s.activeField === "when" ? " on" : "");
+    v.thenCls = "field" + (s.activeField === "then" ? " on" : "");
+    v.focusWhen = set({ activeField: "when" });
+    v.focusThen = set({ activeField: "then" });
+    const isWhen = s.activeField === "when";
+    v.fieldLabel = isWhen ? "When... (a moment you already have)" : "I will... (the smallest version)";
+    v.fieldVal = isWhen ? s.whenVal : s.thenVal;
+    v.onField = (e) => this.setState(isWhen ? { whenVal: e.target.value } : { thenVal: e.target.value });
+    v.sugLabel = isWhen ? "Pick a moment from your day" : "Pick the action";
+    v.sugChips = (isWhen ? WHEN_SUG : THEN_SUG).map((t) => {
+      const on = (isWhen ? s.whenVal : s.thenVal) === t;
+      return { label: t, cls: "chip sm" + (on ? " on" : ""), pick: () => this.setState(isWhen ? { whenVal: t, activeField: "then" } : { thenVal: t }) };
+    });
+    const ca = WHEN_ANCHOR[s.whenVal];
+    v.floorNudgeNote = ca ? "We'll nudge you around " + this.fmt(s.anchors[ca] + (ca === "lunch" ? 30 : 0)) + "." : "We'll nudge you in your morning brief.";
+
+    // savings
+    v.saveAmt = s.saveAmt;
+    v.saveAmtFmt = this.money(s.saveAmt);
+    v.onSlide = (e) => this.setState({ saveAmt: parseInt(e.target.value, 10) });
+    v.age = s.age;
+    v.ageMinus = set({ age: Math.max(16, s.age - 1) });
+    v.agePlus = set({ age: Math.min(70, s.age + 1) });
+    v.targetAge = this.targetAge(s.age);
+    v.futureAgeLabel = "You at " + v.targetAge;
+    v.futureObFmt = this.bigMoney(this.future(s.saveAmt, 0, s.age));
+    v.futureObNote = this.money(s.saveAmt) + "/month for " + (v.targetAge - s.age) + " years, growing at 12% a year.";
+    const mkKeys = (field) => ["1", "2", "3", "4", "5", "6", "7", "8", "9", "00", "0", "del"].map((k) => ({ label: k, isDel: k === "del", isNum: k !== "del", aria: k === "del" ? "Delete" : k, press: () => this.keyPress(field, k) }));
+    v.obKeys = mkKeys("ob");
+
+    // notifications preview
+    const previewState = Object.assign({}, s, { floors: s.floors.length ? s.floors : [{ id: "x", goal: "_core", anchor: WHEN_ANCHOR[s.whenVal] || "lunch", action: this.cap(s.thenVal) }] });
+    v.obNudges = this.nudgesFor(previewState, 1).slice(0, 5).map((n) => ({ title: n.title, body: n.body, time: this.fmt(n.t) }));
+    v.notifOn = () => { this.setState({ notif: true }); this.obNext(); this.later(() => this.toast("Nudges on."), 200); };
+    v.notifOff = () => { this.setState({ notif: false }); this.obNext(); };
+
+    // paywall
+    v.recapIds = ids.join(" · ");
+    v.recapFocus = s.goals.filter((g) => s.tiers[g] === 1).join(", ") || "Not set";
+    v.recapFloor = "When " + s.whenVal + ", I will " + this.lc(s.thenVal) + ".";
+    v.recapDay = "Lunch " + this.fmt(s.anchors.lunch) + " · Check-in " + this.fmt(s.anchors.checkin);
+    v.planAnnualCls = "plan" + (s.plan === "annual" ? " on" : "");
+    v.planMonthlyCls = "plan" + (s.plan === "monthly" ? " on" : "");
+    v.pickAnnual = set({ plan: "annual" });
+    v.pickMonthly = set({ plan: "monthly" });
+    v.trialEndLabel = this.dateFor(s.trialDays || 7).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    v.planAfter = s.plan === "annual" ? "Then $39.99/yr." : "Then $7.99/mo.";
+    v.planPriceLabel = s.plan === "annual" ? "$39.99/yr" : "$7.99/mo";
+    v.startTrial = set({ screen: "success" });
+    v.firstNudgeTime = this.fmt(s.anchors.checkin);
+    v.restore = () => this.toast("No previous purchases found on this account.");
+    v.finishOb = () => this.finishOb();
+
+    // ---------- app ----------
+    v.tabToday = s.tab === "today"; v.tabPlan = s.tab === "plan"; v.tabProgress = s.tab === "progress"; v.tabYou = s.tab === "you";
+    v.tabTodayCls = "tab" + (v.tabToday ? " on" : ""); v.tabPlanCls = "tab" + (v.tabPlan ? " on" : "");
+    v.tabProgressCls = "tab" + (v.tabProgress ? " on" : ""); v.tabYouCls = "tab" + (v.tabYou ? " on" : "");
+    v.goToday = set({ tab: "today", screen: "app" }); v.goPlan = set({ tab: "plan", screen: "app", planDay: 0, sheet: null });
+    v.goProgress = set({ tab: "progress", screen: "app" }); v.goYou = set({ tab: "you", screen: "app" });
+    v.pro = pro; v.notPro = !pro;
+    v.trialEnded = s.trial === "ended";
+    v.trialActive = s.trial === "active" && !s.cancelled;
+    v.sunday = s.sunday;
+
+    const d0 = new Date();
+    if (s.sunday) d0.setDate(d0.getDate() - d0.getDay());
+    v.dateLabel = d0.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+    v.streak = s.streak; v.best = Math.max(s.best, s.streak); v.shields = s.shields;
+    v.streakAria = s.streak + " day streak, " + s.shields + " shield available";
+    v.flameCls = "icf" + (s.flameAnim ? " flick" : "");
+    v.shieldColor = s.shields > 0 ? "#C9A227" : "#6A6A72";
+    v.nowLabel = this.fmt(s.now);
+
+    const vis = this.visible(s.floors, s.tiers);
+    const doneCount = vis.filter((f) => f.done).length;
+    v.doneCount = doneCount; v.visCount = vis.length;
+    const pct = vis.length ? doneCount / vis.length : 0;
+    v.ringOff = (314.16 * (1 - pct)).toFixed(2);
+    const left = vis.length - doneCount;
+    if (vis.length && left === 0) { v.ringTitle = "All floors cleared."; v.ringSub = "Day " + s.streak + " is in the books."; }
+    else if (doneCount === 0) { v.ringTitle = "Nothing cleared yet."; v.ringSub = s.streak ? "Clear all " + vis.length + " to make it " + (s.streak + 1) + " days." : "Clear all " + vis.length + " to start your streak."; }
+    else { v.ringTitle = left + " to go."; v.ringSub = s.streak ? "Clear them to make it " + (s.streak + 1) + " days." : "Clear them to start your streak."; }
+
+    const todayNudges = this.nudgesFor(s, 0);
+    const nxt = todayNudges.find((n) => n.t > s.now);
+    v.nextTitle = nxt ? "Next nudge · " + this.fmt(nxt.t) + " · " + nxt.title : "No more nudges today";
+    v.nextBody = nxt ? nxt.body : "Tomorrow's first nudge: " + this.fmt(this.eff(s, 1).wake + 30) + ".";
+
+    const votesToday = {};
+    vis.forEach((f) => { if (f.done) { const k = this.idFor(f.goal, ids); votesToday[k] = (votesToday[k] || 0) + 1; } });
+    const totalVotesToday = Object.keys(votesToday).reduce((a, k) => a + votesToday[k], 0);
+    v.votesToday = totalVotesToday;
+
+    const floorView = (f) => {
+      const idn = this.idFor(f.goal, ids);
+      let extra = "";
+      if (f.done && f.viaHealth) extra = "Synced from Apple Health";
+      else if (f.done && f.proof) extra = "Proof: " + f.proof;
+      else if (!f.done && f.health) extra = "Auto-clears from Apple Health";
+      else if (f.lighter) extra = "Lighter floor today";
+      return {
+        id: f.id, action: f.action, done: f.done,
+        sentence: f.done ? "+1 " + idn + " vote" : "When " + f.when + ", I will",
+        sentCls: "fsent" + (f.done ? " vote" : ""),
+        whenLine: "When " + f.when + " · " + this.fmt(this.eff(s, 0)[f.anchor] || 0),
+        rowCls: "floor" + (f.done ? " done" : ""),
+        cbCls: "cb" + (f.done ? " on" : ""),
+        hasExtra: !!extra, extra: extra,
+        hasReward: !!f.reward && pro,
+        rewardLine: f.reward + (f.done ? " unlocked" : " unlocks after this"),
+        lockAria: f.reward ? "Edit reward" : "Lock a reward",
+        proofAria: f.proof ? "Edit proof" : "Add proof",
+        toggle: () => this.toggleFloor(f.id),
+        openReward: () => this.openReward(f.id),
+        openProof: () => this.setState({ sheet: "proof", proofFloor: f.id, proofDraft: f.proof || "", proofPhoto: false })
+      };
+    };
+    v.todayFloors = vis.map(floorView);
+    const todayTasks = s.tasks.filter((t) => t.day === 0).sort((a, b) => a.t - b.t);
+    v.hasTodayTasks = todayTasks.length > 0;
+    v.todayTasks = todayTasks.map((t) => ({ title: t.title, time: this.fmt(t.t), done: t.done, cbCls: "cb" + (t.done ? " on" : ""), toggle: () => this.toggleTask(t.id) }));
+    v.skipTodayFmt = this.money(s.skipToday);
+    v.skipMonthLine = this.money(s.savedMonth) + " skipped this month, all to future you.";
+    v.openSkip = set({ sheet: "skip", padVal: "", padLabel: "" });
+    v.openPaywall = set({ sheet: "paywall", subConfirm: false });
+    v.openReview = set({ screen: "review", reviewStep: 0 });
+    v.openIdea = set({ sheet: "idea", ideaDraft: "" });
+
+    // close the day card
+    const A0 = this.eff(s, 0);
+    const evening = s.now >= A0.checkin;
+    v.closeCanStart = !s.dayClosed;
+    if (s.dayClosed) { v.closeTitle = "Day closed"; v.closeSub = "Tomorrow starts at " + this.fmt(this.eff(s, 1).wake) + "."; }
+    else if (evening) { v.closeTitle = "It's " + this.fmt(s.now) + ". Close the day."; v.closeSub = "2 minutes: how it went, then plan tomorrow."; }
+    else { v.closeTitle = "Close the day · " + this.fmt(A0.checkin); v.closeSub = "We'll nudge you. Or start early."; }
+    v.closeIconCls = "sicon" + (evening && !s.dayClosed ? " goldbg" : "");
+    v.closePillCls = evening ? "pill gold" : "pill";
+    v.closePill = evening ? "Start" : "Start early";
+    v.openClose = set({ screen: "close", closeStep: 0, closeNote: "" });
+
+    // ---------- plan ----------
+    const today = new Date();
+    const wd = today.getDay() === 0 ? 7 : today.getDay();
+    v.planMonth = this.dateFor(s.planDay).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    v.weekDays = [1, 2, 3, 4, 5, 6, 7].map((k) => {
+      const off = k - wd;
+      const dt = this.dateFor(off);
+      const has = s.tasks.some((t) => t.day === off) || !!(s.overrides[off] && Object.keys(s.overrides[off]).length);
+      return {
+        wd: dt.toLocaleDateString("en-US", { weekday: "short" }).charAt(0),
+        num: dt.getDate(), on: s.planDay === off,
+        cls: "day" + (s.planDay === off ? " on" : ""),
+        dotCls: "dot" + (has || off === 0 ? "" : " off"),
+        aria: this.dayLabel(off, true),
+        pick: () => this.setState({ planDay: off })
+      };
+    });
+    v.planToday = set({ planDay: 0 });
+    v.planDayLabel = (s.planDay === 0 ? "Today, " : s.planDay === 1 ? "Tomorrow, " : "") + this.dayLabel(s.planDay);
+    const ovr = s.overrides[s.planDay] || {};
+    v.planEdited = Object.keys(ovr).length > 0;
+    const AP = this.eff(s, s.planDay);
+    const items = [];
+    ANCHORS.forEach((a) => {
+      const fl = vis.filter((f) => f.anchor === a[0]).map((f) => f.action);
+      const edited = ovr[a[0]] !== undefined;
+      items.push({ k: 0, t: AP[a[0]], isAnchor: true, isNudge: false, isTask: false, title: a[1], hasSub: fl.length > 0 || edited, sub: (fl.length ? "Floor: " + fl.join(", ") : "") + (edited ? (fl.length ? " · " : "") + "Changed for this day" : ""), aria: "Edit " + a[1] + " time", edit: () => this.setState({ sheet: "anchor", anchorEdit: a[0], anchorTime: AP[a[0]], anchorScope: "day" }), done: false, cbCls: "", toggle: null });
+    });
+    const anchorTimes = ANCHORS.map((x) => AP[x[0]]);
+    if (s.planDay >= 0) this.nudgesFor(s, s.planDay).filter((n) => !anchorTimes.includes(n.t)).forEach((n) => items.push({ k: 1, t: n.t, isAnchor: false, isNudge: true, isTask: false, title: n.title + ": " + n.body, hasSub: false, sub: "", aria: "", edit: null, done: false, cbCls: "", toggle: null }));
+    s.tasks.filter((t) => t.day === s.planDay).forEach((t) => items.push({ k: 2, t: t.t, isAnchor: false, isNudge: false, isTask: true, title: t.title, hasSub: true, sub: t.remind ? "Nudge 15 min before" : "No nudge", aria: (t.done ? "Mark not done: " : "Mark done: ") + t.title, done: t.done, cbCls: "cb" + (t.done ? " on" : ""), toggle: () => this.toggleTask(t.id), edit: () => this.setState({ sheet: "task", taskEdit: t.id, taskTitle: t.title, taskTime: t.t, taskRemind: t.remind }) }));
+    items.sort((a, b) => a.t - b.t || a.k - b.k);
+    v.timeline = items.map((i) => Object.assign(i, { time: this.fmt(i.t) }));
+    v.openNewTask = set({ sheet: "task", taskEdit: null, taskTitle: "", taskTime: 600, taskRemind: true });
+
+    // ---------- focus ----------
+    v.openFocus = set({ screen: "focus", sheet: null });
+    v.focusBack = set({ screen: "app", tab: "you" });
+    const t1 = s.goals.filter((g) => s.tiers[g] === 1);
+    const t2 = s.goals.filter((g) => s.tiers[g] === 2);
+    const t3 = s.goals.filter((g) => s.tiers[g] === 3);
+    v.t1Count = t1.length;
+    v.t1Cards = t1.map((g) => { const fl = s.floors.filter((f) => f.goal === g).map(floorView); return { name: g, floors: fl, noFloors: fl.length === 0 }; });
+    v.t1Empty = t1.length === 0;
+    v.t2Cards = t2.map((g) => ({ name: g, status: s.reviewed[g] ? "Checked in: " + s.reviewed[g] : "Due Sunday", review: () => this.setState({ sheet: "review2", r2Goal: g, r2Pick: null }) }));
+    v.t2Empty = t2.length === 0;
+    v.t3Cards = t3.map((g) => ({ name: g, promote: () => this.setState({ sheet: "promote", promoteGoal: g, promoteIdea: null, demoteMode: false }) }));
+    v.t3Empty = t3.length === 0;
+    v.ideaDraft = s.ideaDraft;
+    v.onIdeaDraft = (e) => this.setState({ ideaDraft: e.target.value });
+    v.parkIdea = () => this.parkIdea();
+    v.ideaDis = !(s.ideaDraft || "").trim();
+    v.ideaRows = s.ideas.map((i) => {
+      const leftD = Math.max(0, 14 - i.ago);
+      return { name: i.name, ready: leftD === 0, cooling: leftD > 0, pct: Math.round((i.ago / 14) * 100), sub: leftD === 0 ? "Cooled off. Still excited?" : "Unlocks in " + leftD + (leftD === 1 ? " day" : " days"), subCls: leftD === 0 ? "gold small" : "muted small", decide: () => this.setState({ sheet: "promote", promoteGoal: i.name, promoteIdea: i.id, demoteMode: false }) };
+    });
+    v.noIdeas = s.ideas.length === 0;
+    const readyN = s.ideas.filter((i) => i.ago >= 14).length;
+    v.ideaVal = s.ideas.length ? (readyN ? readyN + " ready" : s.ideas.length + " cooling") : "";
+
+    // ---------- progress ----------
+    const reasonsCount = {};
+    s.reasons.forEach((r) => { reasonsCount[r] = (reasonsCount[r] || 0) + 1; });
+    const topReason = Object.keys(reasonsCount).sort((a, b) => reasonsCount[b] - reasonsCount[a])[0];
+    const gymF = vis.find((f) => f.goal === "Gym") || vis[0];
+    v.coachLocked = !pro;
+    v.coachWaiting = pro && (s.isNew || !s.reasons.length);
+    v.coachShow = pro && !v.coachWaiting;
+    v.coachText = (gymF ? gymF.action : "Your floor") + " slipped on 4 of your last 6 Fridays.";
+    v.coachWhy = "Most common reason you gave: " + (topReason || "Low energy").toLowerCase() + ". Every other weekday you clear it 90% of the time.";
+    v.coachOpen = !s.coachDone; v.coachDoneOn = !!s.coachDone;
+    v.coachResult = s.coachDone === "shrink" ? "Done. Fridays are now a 10 min walk. Same streak, lower bar." : "Done. The Friday floor moved to Saturday morning.";
+    v.coachShrink = () => { this.setState({ coachDone: "shrink" }); this.toast("Friday's floor is lighter now."); };
+    v.coachMove = () => { this.setState({ coachDone: "move" }); this.toast("Moved to Saturday."); };
+
+    const vb = s.votesBase || {};
+    const totals = ids.map((n) => (vb[n] || 0) + (votesToday[n] || 0));
+    const mx = Math.max.apply(null, totals.concat([1]));
+    v.identityVotes = ids.map((n, i) => ({ name: n, total: totals[i], pct: Math.max(4, Math.round((totals[i] / mx) * 100)), week: "+" + (s.isNew ? (votesToday[n] || 0) : Math.round(s.weekVotesBase * (i === 0 ? 0.7 : 0.3)) + (votesToday[n] || 0)) + " this week" }));
+
+    let cleared = 0;
+    v.gridFloors = vis.map((f) => {
+      const h = this.hist(f, s);
+      const dn = h.filter((c) => c === "d").length;
+      const started = h.filter((c) => c !== "n" && c !== "t").length;
+      cleared += dn;
+      return {
+        action: f.action,
+        rate: started ? Math.round((dn / started) * 100) + "% cleared" : "Starts today",
+        gridAria: f.action + ": " + dn + " days cleared in the last 12 weeks",
+        cells: h.map((c) => ({ cls: "cell" + (c === "d" ? " d" : c === "n" ? " n" : c === "s" ? " s" : c === "t" ? " t" : ""), shield: c === "s" }))
+      };
+    });
+    v.clearedTotal = cleared;
+    const forge = vis.filter((f) => f.forge < 66);
+    v.forgeFloors = forge.map((f) => ({
+      action: f.action, pct: Math.round((f.forge / 66) * 100),
+      label: f.forge < 33 ? "Day " + f.forge + " of 66" : (66 - f.forge) + " days to Automatic",
+      labelCls: f.forge < 33 ? "muted small" : "gold small"
+    }));
+    v.forgeEmpty = forge.length === 0;
+    const autoList = s.automatic.map((a) => ({ action: a, sub: "Automatic. You raised the floor after day 66." })).concat(s.floors.filter((f) => f.forge >= 66).map((f) => ({ action: f.action, sub: "Graduated on day 66. It's who you are now." })));
+    v.hasAuto = autoList.length > 0;
+    v.autoFloors = autoList;
+
+    const total = (s.savingsHist.length ? s.savingsHist[s.savingsHist.length - 1] : 0) + s.savedMonth + (s.transferDone ? s.saveAmt : 0);
+    v.totalFmt = this.money(total);
+    v.futureFmt = this.bigMoney(this.future(s.saveAmt, total, s.age));
+    v.futureNote = this.money(s.saveAmt) + "/month plus the " + this.money(total) + " you have, growing at 12% a year until " + v.targetAge + ".";
+    const pts = s.savingsHist.concat([total]);
+    v.hasChart = pts.length >= 2; v.noChart = !v.hasChart;
+    if (v.hasChart) {
+      const mxp = Math.max.apply(null, pts) || 1;
+      const xy = pts.map((p, i) => [Math.round((i / (pts.length - 1)) * 300) + 5, Math.round(100 - (p / mxp) * 90)]);
+      v.chartPts = xy.map((q) => q.join(",")).join(" ");
+      v.chartLastX = xy[xy.length - 1][0]; v.chartLastY = xy[xy.length - 1][1];
+      const names = ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
+      v.chartLabels = names.slice(names.length - pts.length);
+      v.chartAria = "Total saved grew from " + this.money(pts[0]) + " to " + this.money(total);
+    } else { v.chartPts = ""; v.chartLastX = 0; v.chartLastY = 0; v.chartLabels = []; v.chartAria = ""; }
+    v.transferDone = s.transferDone;
+    v.transferSub = s.transferDone ? "Moved this month. Nice." : "Due Dec 1. Your monthly savings floor.";
+    v.transferCls = s.transferDone ? "pill" : "pill gold";
+    v.transferBtn = s.transferDone ? "Done" : "Mark done";
+    v.toggleTransfer = () => { this.setState({ transferDone: !s.transferDone }); if (!s.transferDone) this.toast(this.money(s.saveAmt) + " moved. Monthly floor cleared."); };
+
+    // ---------- you ----------
+    v.memberSince = s.memberSince;
+    v.identityTags = ids;
+    v.routineVal = "Lunch " + this.fmt(s.anchors.lunch);
+    v.openFuture = set({ sheet: pro ? "future" : "paywall", letterOpen: false });
+    v.openStakes = set({ sheet: "soon", soon: "stakes" });
+    v.openPair = set({ sheet: "soon", soon: "pair" });
+    v.pairTag = s.waitPair ? "ON WAITLIST" : "SOON";
+    v.stakesTag = s.waitStakes ? "ON WAITLIST" : "SOON";
+    v.partnerVal = s.partner || "Add";
+    v.openPartner = set(s.partner ? { sheet: "partner", cheerSent: false } : { sheet: "contacts", contactMode: "set", contactPick: null });
+    v.notif = s.notif;
+    v.notifSwCls = "sw" + (s.notif ? " on" : "");
+    v.toggleNotif = () => { this.setState({ notif: !s.notif }); this.toast(s.notif ? "Nudges off." : "Nudges on."); };
+    v.openWidget = set({ sheet: "widget" });
+    const nextOpen = vis.find((f) => !f.done);
+    v.widgetNext = nextOpen ? nextOpen.action : "All cleared";
+    v.subVal = s.trial === "pro" ? (s.plan === "annual" ? "Annual" : "Monthly") : s.trial === "ended" ? "Trial ended" : s.cancelled ? "Cancelled" : "Trial · " + s.trialDays + " days left";
+    v.openSub = set({ sheet: "sub", subConfirm: false });
+    v.openHelp = set({ sheet: "help", faqOpen: -1 });
+    const demos = [
+      ["New user", "Restart onboarding", "onboarding", ""],
+      ["Trial active", "4 days left", "trialActive", "Trial active. 4 days left."],
+      ["Trial ended", "Pro locked", "trialEnded", "Trial ended. Pro features locked."],
+      ["Missed 1 day", "Comeback", "comeback", ""],
+      ["Missed 3 days", "Fresh start", "fresh", ""],
+      ["Day 66 graduation", "Raise the floor", "graduate", ""],
+      ["Sunday", "Weekly review", "review", ""]
+    ];
+    v.demoRows = demos.map((x) => ({ label: x[0], hint: x[1], go: () => this.demo(x[2], x[3]) }));
+    const dn = [
+      ["Morning brief", this.fmt(A0.wake + 30), "morning"],
+      ["Lunch check", this.fmt(A0.lunch + 30), "lunch"],
+      ["Close the day", this.fmt(A0.checkin), "evening"],
+      ["Apple Health workout", "Auto-clears gym", "health"],
+      ["Partner cheer", "From Riya", "cheer"],
+      ["Idea cooled off", "Day 14", "idea"]
+    ];
+    v.demoNudges = dn.map((x) => ({ label: x[0], hint: x[1], go: () => this.sendNudge(x[2]) }));
+
+    // celebration
+    v.celebrateLine = "A " + ids[0] + " showed up today.";
+    v.celebrateVotes = "+" + totalVotesToday + " votes cast";
+    v.celebrateDone = () => this.celebrateDone();
+
+    // comeback
+    v.shieldLine = s.shields > 0 ? "Your " + s.streak + "-day streak is safe. A shield covered yesterday." : "Your streak restarts today. The " + s.streak + " days you built still count.";
+    v.reasonChips = ["No time", "Low energy", "Forgot", "Life happened"].map((r) => ({ label: r, on: s.reason === r, cls: "chip" + (s.reason === r ? " on" : ""), pick: () => this.setState({ reason: s.reason === r ? null : r }) }));
+    const shrinkTarget = vis.find((f) => f.action === "30 min gym") || vis.find((f) => SHRINK[f.action]) || { action: "30 min gym" };
+    v.shrinkFrom = shrinkTarget.action;
+    v.shrinkTo = SHRINK[shrinkTarget.action] || shrinkTarget.action;
+    v.shrink = s.shrink;
+    v.shrinkSwCls = "sw" + (s.shrink ? " on" : "");
+    v.oldFloorCls = "oldfloor" + (s.shrink ? " gone" : "");
+    v.toggleShrink = set({ shrink: !s.shrink });
+    v.imBack = () => this.imBack();
+    v.restart = () => this.restart();
+
+    // graduation
+    v.gradTitle = (s.gradName || "This floor") + " is Automatic.";
+    const raised = RAISE[s.gradName] || (s.gradName ? s.gradName + ", level 2" : "the next level");
+    v.raiseBtn = "Raise it to " + raised;
+    v.raiseFloor = () => {
+      const id = s.gradId || "f2";
+      this.setState({ floors: s.floors.map((f) => f.id === id ? Object.assign({}, f, { action: raised, forge: 1 }) : f), automatic: s.automatic.concat([s.gradName]), screen: "app", tab: "progress" });
+      this.toast("New floor: " + raised + ". Day 1 of 66.");
+    };
+    v.keepAuto = set({ screen: "app", tab: "progress" });
+
+    // weekly review
+    const Q = [
+      ["What worked?", "The floor I never skipped was...", ["Morning floors", "Logging spend after lunch", "Gym straight after work"]],
+      ["What slipped?", "Be honest. No one's grading this.", ["Late nights", "Friday gym", "Skipped closing the day"]],
+      ["What's the one thing next week?", "One thing. Not three.", ["Ship the landing page", "Gym 4 times", "Skip $100 of spends"]]
+    ];
+    v.reviewAsking = s.reviewStep < 3; v.reviewShare = s.reviewStep >= 3;
+    v.reviewPct = Math.round((Math.min(s.reviewStep + 1, 3) / 3) * 100);
+    v.reviewStepLabel = s.reviewStep < 3 ? (s.reviewStep + 1) + "/3" : "";
+    const rq = Q[Math.min(s.reviewStep, 2)];
+    v.reviewQ = rq[0]; v.reviewPh = rq[1];
+    v.reviewVal = s.review[Math.min(s.reviewStep, 2)];
+    const setAns = (val) => { const r = s.review.slice(); r[Math.min(s.reviewStep, 2)] = val; this.setState({ review: r }); };
+    v.onReview = (e) => setAns(e.target.value);
+    v.reviewChips = rq[2].map((c) => ({ label: c, pick: () => setAns(c) }));
+    v.reviewDis = !(v.reviewVal || "").trim();
+    v.reviewBtn = s.reviewStep === 2 ? "See my week" : "Next";
+    v.reviewNext = set({ reviewStep: s.reviewStep + 1 });
+    v.closeReview = set({ screen: "app", tab: "today", reviewStep: 0 });
+    let wkD = 0, wkT = 0;
+    vis.forEach((f) => { this.hist(f, s).slice(77).forEach((c) => { if (c !== "n") { wkT++; if (c === "d") wkD++; } }); });
+    v.weekFloors = wkD + "/" + wkT;
+    v.weekVotes = "+" + (s.weekVotesBase + totalVotesToday);
+    v.weekSaved = this.money(s.isNew ? s.savedMonth : 64 + s.skipToday);
+    v.weekLabel = "WEEK " + Math.ceil(((d0 - new Date(d0.getFullYear(), 0, 1)) / 86400000 + 1) / 7);
+    v.oneThing = (s.review[2] || "").trim() || "Ship the landing page";
+    v.sendPartner = set({ sheet: "contacts", contactMode: "send", contactPick: s.partner });
+    v.saveImage = () => this.toast("Saved to Photos.");
+
+    // close the day flow
+    v.close0 = s.closeStep === 0; v.close1 = s.closeStep === 1; v.close2 = s.closeStep === 2; v.close3 = s.closeStep === 3;
+    v.closePct = Math.round((Math.min(s.closeStep + 1, 3) / 3) * 100);
+    v.closeStepLabel = s.closeStep < 3 ? (s.closeStep + 1) + "/3" : "";
+    const tDone = todayTasks.filter((t) => t.done).length;
+    v.tasksDoneLabel = tDone + "/" + todayTasks.length;
+    v.closeVerdict = left === 0 && vis.length ? "Every floor cleared. That's a full day." : doneCount === 0 ? "A quiet day. Tomorrow's floors are still small." : doneCount + " of " + vis.length + " floors. The day counts.";
+    v.closeVerdictSub = left === 0 ? "Streak: " + s.streak + " days." : "Clear what's left below if you did it and forgot to tick.";
+    const openFloors = vis.filter((f) => !f.done);
+    v.closeHasOpen = openFloors.length > 0;
+    v.closeOpenFloors = openFloors.map((f) => ({ action: f.action, toggle: () => this.toggleFloor(f.id) }));
+    v.closeNext = set({ closeStep: s.closeStep + 1 });
+    v.closeNote = s.closeNote;
+    v.onCloseNote = (e) => this.setState({ closeNote: e.target.value });
+    v.closeChips = ["Good, focused day", "Meetings ate it", "Low energy", "Shipped something"].map((c) => ({ label: c, pick: () => this.setState({ closeNote: c }) }));
+    v.closeNoteBtn = (s.closeNote || "").trim() ? "Next" : "Skip for today";
+    v.tomorrowLabel = this.dayLabel(1, true);
+    const A1 = this.eff(s, 1);
+    v.tmWake = this.fmt(A1.wake); v.tmLunch = this.fmt(A1.lunch); v.tmCheckin = this.fmt(A1.checkin);
+    v.changeTomorrow = set({ screen: "app", tab: "plan", planDay: 1 });
+    const tmTasks = s.tasks.filter((t) => t.day === 1).sort((a, b) => a.t - b.t);
+    v.tomorrowTasks = tmTasks.map((t) => ({ title: t.title, time: this.fmt(t.t) }));
+    v.noTomorrowTasks = tmTasks.length === 0;
+    v.tmDraft = s.tmDraft;
+    v.onTmDraft = (e) => this.setState({ tmDraft: e.target.value });
+    v.tmTimeChips = [540, 720, 900, 1080].map((t) => ({ label: this.fmt(t), cls: "chip sm" + (s.tmTime === t ? " on" : ""), pick: () => this.setState({ tmTime: t }) }));
+    v.addTmTask = () => {
+      const title = (s.tmDraft || "").trim();
+      if (!title) return;
+      this.setState({ tasks: s.tasks.concat([{ id: "t" + Date.now(), day: 1, t: s.tmTime, title: title, done: false, remind: true }]), tmDraft: "" });
+    };
+    v.closeFinish = () => this.setState({ closeStep: 3, dayClosed: true });
+    v.closedLine = "Tomorrow starts at " + v.tmWake + ". First nudge at " + this.fmt(A1.wake + 30) + ".";
+
+    // ---------- sheets ----------
+    v.hasSheet = !!s.sheet;
+    v.closeSheet = set({ sheet: null, demoteMode: false, subConfirm: false });
+    ["skip", "reward", "proof", "paywall", "contacts", "partner", "future", "sub", "help", "review2", "promote", "idea", "anchor", "task", "lunch", "soon", "widget"].forEach((k) => { v["sh" + k.charAt(0).toUpperCase() + k.slice(1)] = s.sheet === k; });
+
+    // skip pad
+    const padN = parseInt(s.padVal || "0", 10);
+    v.padFmt = this.money(padN);
+    v.padKeys = mkKeys("pad");
+    v.skipPresets = SKIPS.map((q) => ({ label: q[0] + " $" + q[1], cls: "chip sm" + (s.padLabel === q[0] ? " on" : ""), pick: () => this.setState({ padVal: String(q[1]), padLabel: q[0] }) }));
+    v.padDis = !padN;
+    v.padBtn = padN ? "Send " + this.money(padN) + " to future me" : "Pick or type an amount";
+    v.confirmSkip = () => this.confirmSkip();
+
+    // reward
+    const rf = s.floors.find((f) => f.id === s.rewardFloor);
+    v.rewardFloorName = rf ? rf.action.toLowerCase() : "this floor";
+    v.rewardDraft = s.rewardDraft;
+    v.onRewardDraft = (e) => this.setState({ rewardDraft: e.target.value });
+    v.rewardChips = ["Next episode", "Good coffee", "30 min gaming", "Dessert"].map((c) => ({ label: c, cls: "chip sm" + (s.rewardDraft === c ? " on" : ""), pick: () => this.setState({ rewardDraft: c }) }));
+    v.rewardDis = !(s.rewardDraft || "").trim();
+    v.saveReward = () => { this.setFloor(s.rewardFloor, { reward: s.rewardDraft.trim() }); this.setState({ sheet: null }); this.toast("Reward locked. Go earn it."); };
+    v.rewardHasExisting = !!(rf && rf.reward);
+    v.removeReward = () => { this.setFloor(s.rewardFloor, { reward: "" }); this.setState({ sheet: null }); this.toast("Reward removed."); };
+
+    // proof
+    const pf = s.floors.find((f) => f.id === s.proofFloor);
+    v.proofFloorName = pf ? pf.action.toLowerCase() : "floor";
+    v.proofDraft = s.proofDraft;
+    v.onProofDraft = (e) => this.setState({ proofDraft: e.target.value });
+    v.photoBtn = s.proofPhoto ? "Photo added" : "Add a photo";
+    v.addPhoto = () => { this.setState({ proofPhoto: true }); this.toast("On a phone, the camera opens here."); };
+    v.proofDis = !(s.proofDraft || "").trim() && !s.proofPhoto;
+    v.saveProof = () => { this.setFloor(s.proofFloor, { proof: (s.proofDraft || "").trim() || "Photo" }); this.setState({ sheet: null }); this.toast("Proof saved."); };
+
+    // paywall sheet
+    v.subscribeBtn = s.plan === "annual" ? "Subscribe for $39.99/yr" : "Subscribe for $7.99/mo";
+    v.subscribe = () => { this.setState({ trial: "pro", sheet: null, cancelled: false }); this.toast("Welcome to Pro. Everything's unlocked."); };
+
+    // contacts + partner
+    v.contacts = CONTACTS.map((c) => ({ name: c[0], phone: c[1], initial: c[0].charAt(0), on: s.contactPick === c[0], radioCls: "rwrap" + (s.contactPick === c[0] ? " on" : ""), pick: () => this.setState({ contactPick: c[0] }) }));
+    v.contactDis = !s.contactPick;
+    v.contactBtn = s.contactMode === "send" ? (s.contactPick ? "Send to " + s.contactPick : "Pick one person") : (s.contactPick ? "Make " + s.contactPick + " my partner" : "Pick one person");
+    v.confirmContact = () => {
+      const name = s.contactPick;
+      this.setState({ partner: name, sheet: null });
+      this.toast(s.contactMode === "send" ? "Sent to " + name + "." : name + " is your accountability partner.");
+    };
+    v.partnerName = s.partner || "";
+    v.partnerInitial = (s.partner || "?").charAt(0);
+    v.nudgePartner = s.nudgePartner;
+    v.nudgeSwCls = "sw" + (s.nudgePartner ? " on" : "");
+    v.toggleNudgePartner = set({ nudgePartner: !s.nudgePartner });
+    v.cheerSent = s.cheerSent;
+    v.cheerBtn = s.cheerSent ? "Cheer sent" : "Send " + (s.partner || "them") + " a cheer";
+    v.sendCheer = () => { this.setState({ cheerSent: true }); this.toast("Cheer sent to " + s.partner + "."); };
+    v.changePartner = set({ sheet: "contacts", contactMode: "set", contactPick: s.partner });
+
+    // future self
+    v.letterWriting = s.letterWriting; v.letterSealed = !s.letterWriting;
+    v.letterDraft = s.letterDraft;
+    v.onLetter = (e) => this.setState({ letterDraft: e.target.value });
+    v.letterDis = !(s.letterDraft || "").trim();
+    v.sealLetter = () => { this.setState({ letter: s.letterDraft.trim(), letterWriting: false, letterOpen: false, letterDate: "Sealed " + new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) + ". Read it whenever you need it." }); this.toast("Sealed. Future you will read this."); };
+    v.letter = s.letter; v.letterDate = s.letterDate; v.letterOpen = s.letterOpen;
+    v.letterBtn = s.letterOpen ? "Close letter" : "Read it back";
+    v.toggleLetter = set({ letterOpen: !s.letterOpen });
+    v.rewriteLetter = set({ letterWriting: true, letterDraft: s.letter });
+
+    // subscription
+    v.subConfirm = s.subConfirm; v.subMain = !s.subConfirm;
+    v.trialDays = s.trialDays;
+    v.trialPct = Math.round((s.trialDays / 7) * 100);
+    v.subOther = s.trial === "pro" || (s.trial === "active" && s.cancelled);
+    v.subDetail = s.trial === "pro" ? "ARENA Pro, " + (s.plan === "annual" ? "$39.99/yr" : "$7.99/mo") + ". Thanks for backing yourself."
+      : s.trial === "ended" ? "Your free trial is over. Floors, streaks, nudges and Plan stay free."
+      : s.cancelled ? "Trial cancelled. Full access until " + v.trialEndLabel + ". No charge."
+      : "Free trial. Full access, nothing charged yet.";
+    v.startCancel = set({ subConfirm: true });
+    v.keepTrial = set({ subConfirm: false });
+    v.confirmCancel = () => { this.setState({ cancelled: true, subConfirm: false, sheet: null }); this.toast("Trial cancelled. You won't be charged."); };
+
+    // help
+    const F = [
+      ["What's a floor?", "The smallest version of a habit you can clear on your worst day. Ten minutes still counts."],
+      ["How do nudges know my day?", "They follow your routine. Change a time in Plan for one day or every day, and the nudges move with it."],
+      ["Why do ideas wait 14 days?", "Most new ideas feel urgent and fade fast. If you still want it after 14 days, it's worth a spot."],
+      ["How do shields work?", "You earn one shield a week. Miss a day and it protects your streak automatically."]
+    ];
+    v.faqs = F.map((q, i) => ({ q: q[0], a: q[1], open: s.faqOpen === i, sign: s.faqOpen === i ? "−" : "+", toggle: () => this.setState({ faqOpen: s.faqOpen === i ? -1 : i }) }));
+    v.contactSupport = () => this.toast("Opening mail to support@arena.app");
+
+    // tier 2 review
+    v.r2Name = s.r2Goal || "";
+    const R2 = [["On track", "Kept it moving this week"], ["Slipping", "Needs attention next week"], ["Park it", "Move to Tier 3 for now"]];
+    v.r2Opts = R2.map((o) => ({ label: o[0], sub: o[1], cls: "opt" + (s.r2Pick === o[0] ? " on" : ""), pick: () => this.setState({ r2Pick: o[0] }) }));
+    v.r2Dis = !s.r2Pick;
+    v.saveR2 = () => {
+      const g = s.r2Goal;
+      if (s.r2Pick === "Park it") {
+        const tiers = Object.assign({}, s.tiers); tiers[g] = 3;
+        this.setState({ tiers: tiers, sheet: null });
+        this.toast(g + " parked. It'll be here when you're ready.");
+      } else {
+        const rv = Object.assign({}, s.reviewed); rv[g] = s.r2Pick.toLowerCase();
+        this.setState({ reviewed: rv, sheet: null });
+        this.toast("Logged. See you Sunday.");
+      }
+    };
+
+    // promote / idea decide
+    v.promoteName = s.promoteGoal || "";
+    v.promoteIsIdea = !!s.promoteIdea;
+    v.promoteEyebrow = s.promoteIdea ? "Idea · 14 days later" : "Promote";
+    v.promoteTitle = s.promoteIdea ? "Still excited about " + (s.promoteGoal || "") + "?" : "Where does " + (s.promoteGoal || "") + " go?";
+    v.promoteSub = s.promoteIdea ? "If yes, give it a real spot. If not, let it go with zero guilt." : "";
+    v.promoteChoose = !s.demoteMode; v.promoteDemote = s.demoteMode;
+    v.promoteDaily = () => this.promoteTo(1);
+    v.promoteWeekly = () => this.promoteTo(2);
+    v.letIdeaGo = () => { this.setState({ ideas: s.ideas.filter((i) => i.id !== s.promoteIdea), sheet: null, promoteIdea: null }); this.toast("Let go. That's the filter working."); };
+    v.demoteOpts = t1.map((g) => ({ label: g, pick: () => this.applyPromote(s.promoteGoal, 1, g) }));
+
+    // anchor edit
+    const anc = ANCHORS.find((a) => a[0] === s.anchorEdit);
+    v.anchorName = anc ? anc[1] : "";
+    v.anchorTimeFmt = this.fmt(s.anchorTime);
+    v.anchorMinus = set({ anchorTime: Math.max(0, s.anchorTime - 15) });
+    v.anchorPlus = set({ anchorTime: Math.min(1425, s.anchorTime + 15) });
+    v.scopeDay = s.anchorScope === "day"; v.scopeAll = s.anchorScope === "all";
+    v.scopeDayCls = "segb" + (v.scopeDay ? " on" : ""); v.scopeAllCls = "segb" + (v.scopeAll ? " on" : "");
+    v.scopeDayLabel = "Just " + this.dateFor(s.planDay).toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
+    v.pickScopeDay = set({ anchorScope: "day" }); v.pickScopeAll = set({ anchorScope: "all" });
+    v.saveAnchor = () => this.saveAnchor();
+    v.anchorHasOverride = !!(s.overrides[s.planDay] && s.overrides[s.planDay][s.anchorEdit] !== undefined);
+    v.resetAnchor = () => {
+      const ov = Object.assign({}, s.overrides); const o = Object.assign({}, ov[s.planDay] || {}); delete o[s.anchorEdit]; ov[s.planDay] = o;
+      this.setState({ overrides: ov, sheet: null }); this.toast("Back to your usual time.");
+    };
+
+    // task sheet
+    v.taskEditing = !!s.taskEdit;
+    v.taskSheetTitle = s.taskEdit ? "Edit task" : "New task";
+    v.taskDayLabel = this.dayLabel(s.planDay, true);
+    v.taskTitle = s.taskTitle;
+    v.onTaskTitle = (e) => this.setState({ taskTitle: e.target.value });
+    v.taskTimeFmt = this.fmt(s.taskTime);
+    v.taskMinus = set({ taskTime: Math.max(0, s.taskTime - 15) });
+    v.taskPlus = set({ taskTime: Math.min(1425, s.taskTime + 15) });
+    v.taskTimeChips = [540, 720, 900, 1080].map((t) => ({ label: this.fmt(t), cls: "chip sm" + (s.taskTime === t ? " on" : ""), pick: () => this.setState({ taskTime: t }) }));
+    v.taskRemind = s.taskRemind;
+    v.taskRemindCls = "sw" + (s.taskRemind ? " on" : "");
+    v.toggleTaskRemind = set({ taskRemind: !s.taskRemind });
+    v.taskDis = !(s.taskTitle || "").trim();
+    v.taskSaveBtn = s.taskEdit ? "Save" : "Add to " + this.dayLabel(s.planDay);
+    v.saveTask = () => this.saveTask();
+    v.deleteTask = () => { this.setState({ tasks: s.tasks.filter((t) => t.id !== s.taskEdit), sheet: null }); this.toast("Task deleted."); };
+
+    // lunch check
+    const lf = vis.find((f) => f.anchor === "lunch");
+    v.ateIsYes = s.ate === "yes"; v.ateIsNo = s.ate === "no";
+    v.ateYesCls = "segb" + (v.ateIsYes ? " on" : ""); v.ateNoCls = "segb" + (v.ateIsNo ? " on" : "");
+    v.ateYes = set({ ate: "yes" }); v.ateNo = set({ ate: "no" });
+    v.lunchFloorName = lf ? lf.action : "Log what I spent";
+    v.lunchFloorState = lf && lf.done ? "Already cleared" : "Open";
+    v.lunchDis = !s.ate;
+    v.lunchBtn = s.ate === "no" ? "Remind me in 30 min" : lf && !lf.done ? "Clear " + this.lc(lf.action) : "Done";
+    v.lunchConfirm = () => {
+      if (s.ate === "no") { this.setState({ sheet: null }); this.toast("Okay. Checking back at " + this.fmt(s.now + 30) + "."); return; }
+      this.setState({ sheet: null });
+      if (lf && !lf.done) { this.toggleFloor(lf.id); this.toast("+1 " + this.idFor(lf.goal, ids) + " vote. Enjoy the afternoon."); }
+    };
+
+    // coming soon
+    const isPair = s.soon === "pair";
+    v.soonIsPair = isPair;
+    v.soonTitle = isPair ? "Weekly pair" : "Stakes";
+    v.soonBody = isPair ? "Every week ARENA pairs you with one person who's also working on something. Their goals might look like yours, or nothing like them. Either way, someone notices when you show up." : "Put real money on a floor. If you miss, it goes to a charity you pick. ARENA never keeps a cent.";
+    v.soonMeanwhile = isPair ? "Until then, your nudges and your Coach have your back at the times you set in Plan." : "Until then, locked rewards are the best way to raise the stakes on a floor.";
+    v.soonJoined = isPair ? s.waitPair : s.waitStakes;
+    v.soonBtn = v.soonJoined ? "You're on the waitlist" : "Join the waitlist";
+    v.joinSoon = () => { this.setState(isPair ? { waitPair: true } : { waitStakes: true }); this.toast("You're on the list. We'll tell you first."); };
+
+    return v;
+  }
+}
+
+var start = (new URLSearchParams(location.search)).get("start") || "onboarding";
+preact.render(preact.h(Component, { start: start }), document.getElementById("phone"));
+</script>
+</body>
+</html>
